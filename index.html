@@ -21,7 +21,7 @@
       --text-primary: #d7ffe1;
       --text-secondary: #a9f5b3;
       --text-muted: rgb(132, 255, 176);
-      --text-hero: #84ffb0;;
+      --text-hero: #84ffb0;
       --text-terminal: #84ffb0;
       --text-label: #a9f5b3;
       --text-button: #01210c;
@@ -44,15 +44,12 @@
       --btn-primary-bg: linear-gradient(180deg, rgba(0,255,65,0.95), rgba(0,255,65,0.75));
       --btn-primary-border: rgba(0,255,65,0.25);
       --btn-primary-shadow: var(--accent-dim);
-      --btn-secondary-bg: rgba(255,255,255,0.05);
-      --btn-secondary-border: rgba(255,255,255,0.15);
       --btn-form-bg: rgba(0,0,0,0.8);
       --btn-form-border: #00ff41;
       --btn-form-hover: rgba(0,255,65,0.1);
       
       /* Border Colors */
       --border-primary: rgba(0,255,65,0.18);
-      --border-secondary: rgba(0,255,65,0.15);
       --border-form: #00ff41;
       --border-input: rgba(0,255,65,0.2);
       --border-input-focus: rgba(0,255,65,0.5);
@@ -67,7 +64,6 @@
       --status-success: #00ff41;
       --status-loading: #00ff41;
       --status-error: #ff6b6b;
-      --status-warning: #ffa500;
     }
     *{ box-sizing: border-box; }
     html, body{ height:100%; margin:0; background:var(--bg-primary); color:var(--text-primary); }
@@ -90,10 +86,6 @@
       display:grid; place-items:center;
       background: var(--bg-overlay); backdrop-filter: blur(4px);
       transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-    #boot.morphing {
-      background: rgba(0,0,0,0);
-      backdrop-filter: blur(0px);
     }
     .boot-card{
       width:min(960px, 92vw);
@@ -179,47 +171,6 @@
       position:relative; z-index: 2; height: 100dvh;
       display:grid; place-items:center; padding: clamp(12px, 3vw, 28px);
     }
-    @keyframes cardReveal {
-      0% { 
-        opacity: 0;
-        transform: translateY(30px) scale(0.95);
-        border-color: rgba(0,255,65,0);
-        box-shadow: 0 0 0 var(--accent-dim);
-      }
-      50% {
-        border-color: rgba(0,255,65,0.18);
-      }
-      100% { 
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        border-color: rgba(0,255,65,0.18);
-        box-shadow: 0 20px 70px var(--accent-dim);
-      }
-    }
-
-    @keyframes titleReveal {
-      0% {
-        opacity: 0;
-        transform: translateY(20px);
-        text-shadow: 0 0 0 rgba(0,255,65,0);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-        text-shadow: 0 0 14px rgba(0,255,65,0.28);
-      }
-    }
-
-    @keyframes buttonReveal {
-      0% {
-        opacity: 0;
-        transform: translateY(15px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
 
     .card{
       width:min(960px, 100%);
@@ -239,16 +190,6 @@
       transform: translateY(0);
     }
     
-    .hero {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.2s;
-    }
-    
-    .card.show .hero {
-      opacity: 1;
-      transform: translateY(0);
-    }
     
     .tagline {
       opacity: 0;
@@ -280,14 +221,6 @@
       transform: translateY(0);
     }
 
-    h1.hero{
-      font-size: clamp(18px, 6vw, 72px);
-      line-height:1.05;
-      margin: 0 0 12px;
-      letter-spacing: 0.06em;
-      color:#7fff9f;
-      text-shadow: 0 0 14px rgba(0,255,65,0.28);
-    }
     p.tagline{ margin: 0 0 20px; color: var(--text-secondary); font-size: clamp(14px, 2.4vw, 18px); }
 
     .actions{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
@@ -346,28 +279,41 @@
     /* Terminal Form Modal */
     #formModal{
       position: fixed; inset: 0; z-index: 20;
-      display: none; place-items: center; padding: 20px;
+      display: grid; place-items: center; padding: 20px;
       background: rgba(0,0,0,0);
       backdrop-filter: blur(0px);
-      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1), 
+                  background-color 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  backdrop-filter 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  visibility 0s linear 0.5s;
     }
     #formModal.show{ 
-      display: grid;
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(2px);
+      opacity: 1;
+      visibility: visible;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1), 
+                  background-color 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  backdrop-filter 0.5s cubic-bezier(0.23, 1, 0.32, 1);
     }
     .form-container{
       width: min(700px, 100%); max-height: 90vh; overflow-y: auto;
       background: var(--bg-form);
       border: 2px solid var(--border-form);
-      border-radius: 4px;
+      border-radius: 12px;
       padding: clamp(16px, 3vw, 24px);
-      box-shadow: var(--shadow-form);
+      box-shadow: 
+        0 30px 100px rgba(0,255,65,0.25),
+        0 10px 40px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(0,255,65,0.1);
       position: relative;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       opacity: 0;
-      transform: scale(0.95) translateY(20px);
-      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform: scale(0.7) translateY(60px);
+      transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform, opacity;
     }
     #formModal.show .form-container{
       opacity: 1;
@@ -402,23 +348,35 @@
     
     .form-group{
       margin-bottom: 16px;
-      transform: translateX(-20px);
+      transform: translateX(-40px);
       opacity: 0;
-      transition: all 0.3s ease;
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    #formModal.show .form-group{
+    .form-group.animate-in{
       transform: translateX(0);
       opacity: 1;
     }
-    /* Staggered animation delays */
-    #formModal.show .form-group:nth-child(1){ transition-delay: 0.1s; }
-    #formModal.show .form-group:nth-child(2){ transition-delay: 0.15s; }
-    #formModal.show .form-group:nth-child(3){ transition-delay: 0.2s; }
-    #formModal.show .form-group:nth-child(4){ transition-delay: 0.25s; }
-    #formModal.show .form-group:nth-child(5){ transition-delay: 0.3s; }
-    #formModal.show .form-group:nth-child(6){ transition-delay: 0.35s; }
-    #formModal.show .form-group:nth-child(7){ transition-delay: 0.4s; }
-    #formModal.show .form-group:nth-child(8){ transition-delay: 0.45s; }
+    
+    .form-label{
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: all 0.4s ease-out;
+    }
+    .form-label.animate-in{
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .form-input, .form-textarea, .form-select{
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .form-input.animate-in, .form-textarea.animate-in, .form-select.animate-in{
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
     .form-label{
       display: block; margin-bottom: 6px;
       color: var(--text-label); font-weight: 400;
@@ -434,7 +392,6 @@
       border-radius: 0; color: var(--text-muted);
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 13px;
-      transition: all 0.3s ease;
       box-shadow: inset 0 0 10px var(--accent-dim);
     }
     .form-input:focus, .form-textarea:focus, .form-select:focus{
@@ -623,20 +580,6 @@
       max-width: 400px;
     }
     
-    @keyframes successPulse {
-      0% { 
-        transform: scale(0.95); 
-        box-shadow: 0 0 10px rgba(0,255,65,0.1); 
-      }
-      50% { 
-        transform: scale(1.02); 
-        box-shadow: 0 0 30px rgba(0,255,65,0.3); 
-      }
-      100% { 
-        transform: scale(1); 
-        box-shadow: 0 0 20px rgba(0,255,65,0.2); 
-      }
-    }
 
     /* QR Code Button */
     .qr-button {
@@ -1066,12 +1009,9 @@
         const bootCard = $('.boot-card');
         const terminal = $('.terminal');
         const bootControls = $('.boot-controls');
-        const heroText = $('.hero-text');
 
         // Immediately hide boot controls
         bootControls.style.display = 'none';
-
-        const mainText = "DOES YOUR BUSINESS NEED TECHNICAL EXPERTISE?";
         const typingText = $('.typing-text');
         const line1 = $('.line1');
         const line2 = $('.line2');
@@ -1123,10 +1063,33 @@
               // Start typing animation
               typingText.style.opacity = '1';
               
-              // Set the text for each line
-              line1.textContent = 'DOES YOUR';
-              line2.textContent = 'BUSINESS NEED';
-              line3.textContent = 'TECHNICAL EXPERTISE?';
+              // Animate each line with typing effect (2x faster, smoother)
+              const lines = ['DOES YOUR', 'BUSINESS NEED', 'TECHNICAL EXPERTISE?'];
+              const lineElements = [line1, line2, line3];
+              
+              let currentLine = 0;
+              let currentChar = 0;
+              
+              function typeNextChar() {
+                if (currentLine < lines.length) {
+                  const line = lines[currentLine];
+                  const element = lineElements[currentLine];
+                  
+                  if (currentChar < line.length) {
+                    element.textContent = line.slice(0, currentChar + 1);
+                    currentChar++;
+                    setTimeout(typeNextChar, 25); // Much faster, smoother typing
+                  } else {
+                    // Move to next line
+                    currentLine++;
+                    currentChar = 0;
+                    setTimeout(typeNextChar, 50); // Shorter pause between lines
+                  }
+                }
+              }
+              
+              // Start typing animation immediately
+              setTimeout(typeNextChar, 100);
             }
           }, 150);
       }
@@ -1147,12 +1110,6 @@
       // Initialize EmailJS
       emailjs.init(EMAILJS_CONFIG.publicKey);
       
-      // Test EmailJS connection
-      console.log('EmailJS initialized with:', {
-        publicKey: EMAILJS_CONFIG.publicKey,
-        serviceId: EMAILJS_CONFIG.serviceId,
-        templateId: EMAILJS_CONFIG.templateId
-      });
 
       // Modal elements
       const modal = $('#formModal');
@@ -1164,13 +1121,6 @@
       const loadingState = $('#loadingState');
       const successMessage = $('#successMessage');
       
-      // Debug: Check if elements are found
-      console.log('Form elements found:', {
-        form: !!form,
-        modal: !!modal,
-        loadingState: !!loadingState,
-        successMessage: !!successMessage
-      });
 
       // Cookie utilities
       const COOKIE_NAME = 'techHelpFormData';
@@ -1236,17 +1186,71 @@
 
       // Open modal
       function openModal() {
-        modal.style.display = 'grid';
+        document.body.style.overflow = 'hidden';
+        modal.setAttribute('aria-hidden', 'false');
+        loadFormData();
+        
+        // Trigger smooth fade in
         requestAnimationFrame(() => {
           modal.classList.add('show');
-          modal.setAttribute('aria-hidden', 'false');
-          document.body.style.overflow = 'hidden';
-          loadFormData();
+          
+          // Animate form elements one by one after container appears
           setTimeout(() => {
-            const firstEmpty = form.querySelector('input:not([value]), input[value=""]') || $('#name');
-            firstEmpty.focus();
-          }, 300);
+            animateFormElements();
+          }, 700); // Wait for form container to fully appear
         });
+      }
+      
+      // Animate form elements one by one
+      function animateFormElements() {
+        const formGroups = form.querySelectorAll('.form-group');
+        const formActions = form.querySelector('.form-actions');
+        
+        // Animate each form group with typing effect
+        formGroups.forEach((group, index) => {
+          setTimeout(() => {
+            // Animate the group container
+            group.classList.add('animate-in');
+            
+            // Animate label and input separately
+            const label = group.querySelector('.form-label');
+            const input = group.querySelector('.form-input, .form-textarea, .form-select');
+            
+            if (label) {
+              setTimeout(() => {
+                label.classList.add('animate-in');
+              }, 200);
+            }
+            
+            if (input) {
+              setTimeout(() => {
+                input.classList.add('animate-in');
+                
+                // Focus first empty field
+                if (index === 0) {
+                  setTimeout(() => {
+                    const firstEmpty = form.querySelector('input:not([value]), input[value=""]') || $('#name');
+                    firstEmpty.focus();
+                  }, 300);
+                }
+              }, 400);
+            }
+          }, index * 300); // Stagger each group by 300ms
+        });
+        
+        // Animate form actions last
+        if (formActions) {
+          setTimeout(() => {
+            formActions.style.opacity = '0';
+            formActions.style.transform = 'translateY(20px)';
+            formActions.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+            
+            requestAnimationFrame(() => {
+              formActions.style.opacity = '1';
+              formActions.style.transform = 'translateY(0)';
+            });
+          }, formGroups.length * 300 + 200);
+        }
       }
 
       // Close modal
@@ -1254,10 +1258,11 @@
         modal.classList.remove('show');
         modal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
+        
+        // Wait for fade out animation to complete
         setTimeout(() => {
-          modal.style.display = 'none';
           resetForm();
-        }, 400);
+        }, 500); // Match the CSS transition duration
       }
 
       // Reset form (but keep saved data)
@@ -1294,8 +1299,6 @@
 
       // Show loading state
       function showLoading() {
-        console.log('Showing loading state...');
-        
         // Fade out form fields
         const formGroups = form.querySelectorAll('.form-group');
         const formActions = form.querySelector('.form-actions');
@@ -1324,8 +1327,6 @@
 
       // Show success message
       function showSuccess() {
-        console.log('Showing success message...');
-        
         // Hide loading
         if (loadingState) {
           loadingState.classList.remove('show');
@@ -1347,7 +1348,6 @@
         
         if (successMessage) {
           successMessage.classList.add('show');
-          console.log('Success message classes:', successMessage.className);
         }
         
         // Clear saved data on successful submission
@@ -1457,9 +1457,6 @@ Submitted: ${new Date().toLocaleString()}`
           const formData = new FormData(form);
           const templateParams = formatFormData(formData);
 
-          console.log('Sending email with params:', templateParams);
-          console.log('EmailJS Config:', EMAILJS_CONFIG);
-
           // Use manual send method with proper parameter mapping
           const response = await emailjs.send(
             EMAILJS_CONFIG.serviceId,
@@ -1468,7 +1465,6 @@ Submitted: ${new Date().toLocaleString()}`
             EMAILJS_CONFIG.publicKey
           );
 
-          console.log('EmailJS Response:', response);
           
           if (response.status === 200 || response.text === 'OK') {
             showSuccess();
@@ -1476,12 +1472,6 @@ Submitted: ${new Date().toLocaleString()}`
             throw new Error('Email service returned status: ' + response.status);
           }
         } catch (error) {
-          console.error('EmailJS Error:', error);
-          console.error('Error details:', {
-            message: error.message,
-            status: error.status,
-            text: error.text
-          });
           showError(error.text || error.message || 'Failed to send email. Please try again or contact us directly.');
         }
       }
@@ -1519,7 +1509,6 @@ Submitted: ${new Date().toLocaleString()}`
       const qrButton = $('#qrButton');
       const qrModal = $('#qrModal');
       const closeQrBtn = $('#closeQrBtn');
-      const qrCode = $('#qrCode');
 
       function openQrModal() {
         qrModal.style.display = 'grid';
@@ -1546,13 +1535,9 @@ Submitted: ${new Date().toLocaleString()}`
         if (e.target === qrModal) closeQrModal();
       });
 
-      // Save data before page unload
+      // Initialize functionality
       window.addEventListener('beforeunload', saveFormData);
-
-      // Initialize auto-save functionality
       setupAutoSave();
-
-      // Load saved data on page load
       document.addEventListener('DOMContentLoaded', loadFormData);
     })();
   </script>
