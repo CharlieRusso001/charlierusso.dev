@@ -316,7 +316,7 @@
     /* Mobile and tablet text size increases */
     @media (max-width: 768px) and (min-width: 481px){
       .hero-text { font-size: clamp(30px, 6.5vw, 76px); }
-      .tagline { font-size: clamp(18px, 3.2vw, 24px); }
+      p.tagline { font-size: clamp(11px, 1.9vw, 14px); }
     }
 
     @media (max-width: 480px){
@@ -326,7 +326,21 @@
       
       /* Mobile text size increases */
       .hero-text { font-size: clamp(40px, 8.5vw, 102px); }
-      .tagline { font-size: clamp(21px, 3.6vw, 27px); }
+      p.tagline { font-size: clamp(11px, 1.9vw, 14px); }
+      
+      /* Mobile line breaks for hero text */
+      .typing-text .line1,
+      .typing-text .line2,
+      .typing-text .line3 {
+        display: block;
+      }
+      
+      /* Mobile line breaks for tagline text */
+      .tagline-line1,
+      .tagline-line2 {
+        display: block;
+        white-space: nowrap;
+      }
     }
 
     /* Terminal Form Modal */
@@ -812,9 +826,16 @@
   <main class="wrap">
     <section id="card" class="card" role="region" aria-label="Technical help call to action">
       <div class="hero-text">
-        <span class="typing-text"></span>
+        <span class="typing-text">
+          <span class="line1"></span>
+          <span class="line2"></span>
+          <span class="line3"></span>
+        </span>
       </div>
-      <p class="tagline">Affordable development freelancing services for fullstack development, prototype manufacturing, etc.</p>
+      <p class="tagline">
+        <span class="tagline-line1">Affordable development freelancing services foR</span>
+        <span class="tagline-line2">fullstack development, prototype manufacturing, etc.</span>
+      </p>
       <div class="actions">
         <button class="btn" id="openFormBtn" type="button">Fill out Your Inquiry Here</button>
         <a class="email" href="mailto:russoc2023@fau.edu" aria-label="Email russoc2023 at fau dot edu">
@@ -1052,6 +1073,9 @@
 
         const mainText = "DOES YOUR BUSINESS NEED TECHNICAL EXPERTISE?";
         const typingText = $('.typing-text');
+        const line1 = $('.line1');
+        const line2 = $('.line2');
+        const line3 = $('.line3');
         
         // Create morphing timeline with spring-like easing
         const morphTimeline = anime.timeline({
@@ -1098,22 +1122,11 @@
               
               // Start typing animation
               typingText.style.opacity = '1';
-              let typed = '';
-              anime({
-                targets: { progress: 0 },
-                progress: 1,
-                duration: 1500,
-                easing: 'linear',
-                round: 1,
-                update: (anim) => {
-                  const progress = Math.floor(mainText.length * (anim.progress / 100));
-                  typed = mainText.slice(0, progress);
-                  typingText.textContent = typed;
-                },
-                complete: () => {
-                  typingText.textContent = mainText;
-                }
-              });
+              
+              // Set the text for each line
+              line1.textContent = 'DOES YOUR';
+              line2.textContent = 'BUSINESS NEED';
+              line3.textContent = 'TECHNICAL EXPERTISE?';
             }
           }, 150);
       }
