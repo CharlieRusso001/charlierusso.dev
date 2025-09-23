@@ -1121,12 +1121,136 @@
       // EmailJS Configuration
       const EMAILJS_CONFIG = {
         publicKey: 'koG6eWbBRll3MwQU9', // Your EmailJS public key
-        serviceId: 'service_0r9aneq', // Your EmailJS service ID
-        templateId: 'template_4uw5t74' // Your EmailJS template ID
+        serviceId: 'service_0r9aneq', // Your EmailJS service ID for client emails
+        referralServiceId: 'service_3uom8fe', // Your EmailJS service ID for referral emails (separate service)
+        templateId: 'template_4uw5t74', // Your EmailJS template ID for client emails
+        referralTemplateId: 'template_0gw81ok' // Your EmailJS template ID for referral emails
       };
 
       // Initialize EmailJS
       emailjs.init(EMAILJS_CONFIG.publicKey);
+
+      // ===== Referral System =====
+      const REFERRAL_COOKIE_NAME = 'techHelpReferrer';
+      const REFERRAL_COOKIE_EXPIRY_DAYS = 30; // Referral attribution lasts 30 days
+
+      // Extract referrer from URL and store in cookie
+      function handleReferralTracking() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const referrerEmail = urlParams.get('ref');
+        
+        if (referrerEmail && isValidEmail(referrerEmail)) {
+          console.log('🎯 Referrer tracked from URL:', referrerEmail);
+          
+          // Note: We're keeping the ?ref= parameter in the URL for simplicity
+          // This way we can always read it directly from the URL
+          
+          // Optional: Show a subtle indication that referral was detected
+          // (for debugging purposes - remove in production)
+          if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log('🔗 Referral link detected! Referrer:', referrerEmail);
+          }
+        }
+      }
+
+      // Get current referrer from URL parameter
+      function getReferrer() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const referrer = urlParams.get('ref');
+        console.log('🔍 getReferrer() called, URL param value:', referrer);
+        return referrer && isValidEmail(referrer) ? referrer : null;
+      }
+
+      // Validate email format
+      function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      }
+
+      // Initialize referral tracking on page load
+      handleReferralTracking();
+
+      // Debug function to check current referrer (for testing)
+      window.checkReferrer = function() {
+        const referrer = getReferrer();
+        if (referrer) {
+          console.log('✅ Current referrer from URL:', referrer);
+          return referrer;
+        } else {
+          console.log('❌ No referrer found in URL');
+          return null;
+        }
+      };
+
+      // Debug function to simulate referral (for testing)
+      window.simulateReferral = function(email) {
+        if (isValidEmail(email)) {
+          const newUrl = new URL(window.location);
+          newUrl.searchParams.set('ref', email);
+          window.history.replaceState({}, document.title, newUrl.toString());
+          console.log('🧪 Simulated referral for:', email);
+          console.log('🔍 Current referrer after simulation:', getReferrer());
+          return true;
+        } else {
+          console.log('❌ Invalid email format');
+          return false;
+        }
+      };
+
+      // Debug function to test the complete email system
+      window.testEmailSystem = function() {
+        console.log('🧪 Testing email system...');
+        console.log('📧 EmailJS Config:', EMAILJS_CONFIG);
+        console.log('📧 Client Service ID:', EMAILJS_CONFIG.serviceId);
+        console.log('📧 Referral Service ID:', EMAILJS_CONFIG.referralServiceId);
+        console.log('📧 Client Template ID:', EMAILJS_CONFIG.templateId);
+        console.log('📧 Referral Template ID:', EMAILJS_CONFIG.referralTemplateId);
+        console.log('🔍 Current referrer:', getReferrer());
+        console.log('✅ Email system test complete');
+      };
+
+      // Debug function to verify service IDs are different
+      window.verifyServices = function() {
+        console.log('🔍 Service verification:');
+        console.log('Client service:', EMAILJS_CONFIG.serviceId);
+        console.log('Referral service:', EMAILJS_CONFIG.referralServiceId);
+        console.log('Are they different?', EMAILJS_CONFIG.serviceId !== EMAILJS_CONFIG.referralServiceId);
+      };
+
+      // Debug function to test referral service directly
+      window.testReferralService = async function() {
+        console.log('🧪 Testing referral service directly...');
+        
+        const testParams = {
+          to_name: 'Test User',
+          to_email: 'therealjesusman@gmail.com',
+          from_name: 'Charlie Russo',
+          from_email: 'russoc2023@fau.edu',
+          reply_to: 'russoc2023@fau.edu',
+          email2: 'therealjesusman@gmail.com', // Template recipient variable
+          from_name: 'Test Client',
+          timestamp: new Date().toLocaleString()
+        };
+        
+        try {
+          const response = await emailjs.send(
+            EMAILJS_CONFIG.referralServiceId,
+            EMAILJS_CONFIG.referralTemplateId,
+            testParams,
+            EMAILJS_CONFIG.publicKey
+          );
+          console.log('✅ Test referral email sent:', response);
+        } catch (error) {
+          console.error('❌ Test referral email failed:', error);
+        }
+      };
+
+      // Debug function to manually check cookie
+      window.checkCookie = function() {
+        console.log('🍪 Cookie name:', REFERRAL_COOKIE_NAME);
+        console.log('🍪 Cookie value:', getCookie(REFERRAL_COOKIE_NAME));
+        console.log('🍪 All cookies:', document.cookie);
+      };
       
 
       // Modal elements
@@ -1383,7 +1507,7 @@
         alert('Error: ' + message + '\n\nPlease try again or contact russoc2023@fau.edu directly.');
       }
 
-      // Format form data for email template
+      // Format form data for client email template
       function formatFormData(formData) {
         const budgetLabels = {
           'low': '50-100 USD',
@@ -1414,7 +1538,7 @@
           // Email routing
           to_name: 'Charlie Russo',
           to_email: 'russoc2023@fau.edu',
-          cc_email: 'russoc2023@fau.edu', // CC yourself
+          // cc_email: 'russoc2023@fau.edu', // Removed CC to test
           
           // Client information
           from_name: name,
@@ -1459,6 +1583,29 @@ Submitted: ${new Date().toLocaleString()}`
         };
       }
 
+      // Format data for referral email template
+      function formatReferralData(formData, referrerEmail) {
+        const name = formData.get('name') || '';
+        
+        // Extract referrer name from email (everything before @)
+        const referrerName = referrerEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        
+        return {
+          // Email routing for referrer
+          to_name: referrerName,
+          to_email: referrerEmail,
+          from_name: 'Charlie Russo',
+          from_email: 'russoc2023@fau.edu',
+          reply_to: 'russoc2023@fau.edu',
+          
+          // EmailJS template variables (matching your template configuration)
+          email2: referrerEmail, // This is what your template expects for recipient
+          from_email2: referrerEmail, // Alternative variable name for referral email
+          from_name: name, // Client's name
+          timestamp: new Date().toLocaleString()
+        };
+      }
+
       // Submit form
       async function submitForm(e) {
         e.preventDefault();
@@ -1473,22 +1620,77 @@ Submitted: ${new Date().toLocaleString()}`
 
         try {
           const formData = new FormData(form);
-          const templateParams = formatFormData(formData);
+          const clientTemplateParams = formatFormData(formData);
 
-          // Use manual send method with proper parameter mapping
-          const response = await emailjs.send(
+          // Send client email (main inquiry)
+          console.log('🔍 Sending client email with template:', EMAILJS_CONFIG.templateId);
+          console.log('🔍 Sending client email with service:', EMAILJS_CONFIG.serviceId);
+          console.log('🔍 Client template params:', clientTemplateParams);
+          console.log('🔍 CRITICAL: Client email should go TO:', clientTemplateParams.to_email);
+          console.log('🔍 CRITICAL: Client email CC:', clientTemplateParams.cc_email);
+          
+          const clientResponse = await emailjs.send(
             EMAILJS_CONFIG.serviceId,
             EMAILJS_CONFIG.templateId,
-            templateParams,
+            clientTemplateParams,
             EMAILJS_CONFIG.publicKey
           );
 
-          
-          if (response.status === 200 || response.text === 'OK') {
-            showSuccess();
-          } else {
-            throw new Error('Email service returned status: ' + response.status);
+          console.log('✅ Client email response:', clientResponse);
+
+          if (clientResponse.status !== 200 && clientResponse.text !== 'OK') {
+            throw new Error('Failed to send client email. Status: ' + clientResponse.status);
           }
+
+          // Check for referrer and send referral email if exists
+          const referrerEmail = getReferrer();
+          console.log('🔍 Checking for referrer:', referrerEmail);
+          console.log('🔍 Is valid email?', referrerEmail ? isValidEmail(referrerEmail) : 'No referrer found');
+          
+          if (referrerEmail && isValidEmail(referrerEmail)) {
+            console.log('✅ Referrer found! Sending referral email...');
+            try {
+              const referralTemplateParams = formatReferralData(formData, referrerEmail);
+              
+              // Send referral thank you email
+              console.log('🔍 Sending referral email with template:', EMAILJS_CONFIG.referralTemplateId);
+              console.log('🔍 Sending referral email with service:', EMAILJS_CONFIG.referralServiceId);
+              console.log('🔍 Referral template params:', referralTemplateParams);
+              console.log('🔍 CRITICAL: Referral email should go TO:', referralTemplateParams.to_email);
+              console.log('🔍 CRITICAL: Referral email FROM:', referralTemplateParams.from_email);
+              console.log('🔍 CRITICAL: Email2 (template recipient):', referralTemplateParams.email2);
+              console.log('🔍 CRITICAL: From_email2 (referral email):', referralTemplateParams.from_email2);
+              console.log('🔍 CRITICAL: Client name (from_name):', referralTemplateParams.from_name);
+              console.log('🔍 CRITICAL: Timestamp:', referralTemplateParams.timestamp);
+              
+              const referralResponse = await emailjs.send(
+                EMAILJS_CONFIG.referralServiceId,
+                EMAILJS_CONFIG.referralTemplateId,
+                referralTemplateParams,
+                EMAILJS_CONFIG.publicKey
+              );
+
+              console.log('✅ Referral email response:', referralResponse);
+              console.log('📧 Referral email sent to:', referrerEmail);
+              
+              // Don't fail the whole process if referral email fails
+              if (referralResponse.status !== 200 && referralResponse.text !== 'OK') {
+                console.warn('⚠️ Referral email failed, but continuing with success flow. Status:', referralResponse.status);
+              }
+            } catch (referralError) {
+              console.error('❌ Failed to send referral email:', referralError);
+              console.error('❌ Referral error details:', {
+                message: referralError.message,
+                text: referralError.text,
+                status: referralError.status
+              });
+              // Continue with success flow even if referral email fails
+            }
+          } else {
+            console.log('❌ No referrer found or invalid email. Skipping referral email.');
+          }
+
+          showSuccess();
         } catch (error) {
           showError(error.text || error.message || 'Failed to send email. Please try again or contact us directly.');
         }
