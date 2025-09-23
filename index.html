@@ -714,6 +714,28 @@
       height: auto;
     }
 
+    /* Form Pages */
+    .form-page {
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .form-page.slide-out-left {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    
+    .form-page.slide-in-right {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    
+    .referral-fields {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(0,255,65,0.2);
+      transition: all 0.4s ease-out;
+    }
+
     /* Mobile Responsive Form */
     @media (max-width: 768px){
       #formModal{ padding: 12px; }
@@ -819,56 +841,96 @@
       </div>
       
       <form id="helpForm">
-        <div class="form-group">
-          <label class="form-label" for="name">Full Name *</label>
-          <input type="text" id="name" name="name" class="form-input" required>
+        <!-- Page 1: Main Inquiry Form -->
+        <div id="formPage1" class="form-page">
+          <div class="form-group">
+            <label class="form-label" for="name">Full Name *</label>
+            <input type="text" id="name" name="name" class="form-input" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address *</label>
+            <input type="email" id="email" name="email" class="form-input" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" class="form-input">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="urgency">Project Budget *</label>
+            <select id="urgency" name="urgency" class="form-select" required>
+              <option value="">Select Budget</option>
+              <option value="low">50-100 USD</option>
+              <option value="medium">100-500 USD</option>
+              <option value="high">500-1000 USD</option>
+              <option value="critical">Infinite Money</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="category">Issue Category *</label>
+            <select id="category" name="category" class="form-select" required>
+              <option value="">Select category</option>
+              <option value="web">Website Development</option>
+              <option value="software">Backend Development</option>
+              <option value="3d">3D-Printing / 3D-Modeling</option>
+              <option value="electronics">Electronics Prototyping</option>
+              <option value="training">Software Training</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="description">What do you want developed? *</label>
+            <textarea id="description" name="description" class="form-textarea" 
+                      placeholder="Please describe what you need developed for your project."
+                      required></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="device">Your Website (if it exists)</label>
+            <input type="text" id="device" name="device" class="form-input" 
+                   placeholder="domain.com">
+          </div>
         </div>
-        
-        <div class="form-group">
-          <label class="form-label" for="email">Email Address *</label>
-          <input type="email" id="email" name="email" class="form-input" required>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label" for="phone">Phone Number</label>
-          <input type="tel" id="phone" name="phone" class="form-input">
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label" for="urgency">Project Budget *</label>
-          <select id="urgency" name="urgency" class="form-select" required>
-            <option value="">Select Budget</option>
-            <option value="low">50-100 USD</option>
-            <option value="medium">100-500 USD</option>
-            <option value="high">500-1000 USD</option>
-            <option value="critical">Infinite Money</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label" for="category">Issue Category *</label>
-          <select id="category" name="category" class="form-select" required>
-            <option value="">Select category</option>
-            <option value="web">Website Development</option>
-            <option value="software">Backened Development</option>
-            <option value="3d">3D-Printing / 3D-Modeling</option>
-            <option value="electronics">Electronics Prototyping</option>
-            <option value="training">Software Training</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label" for="description">What do you want developed? *</label>
-          <textarea id="description" name="description" class="form-textarea" 
-                    placeholder="Please describe what you need developed for your project."
-                    required></textarea>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label" for="device">Your Website (if it exists)</label>
-          <input type="text" id="device" name="device" class="form-input" 
-                 placeholder="domain.com">
+
+        <!-- Page 2: Referral Information -->
+        <div id="formPage2" class="form-page" style="display: none;">
+          <div class="form-group">
+            <label class="form-label" for="wasReferred">Were you referred by someone?</label>
+            <select id="wasReferred" name="wasReferred" class="form-select">
+              <option value="no">No, I found you myself</option>
+              <option value="yes">Yes, I was referred</option>
+            </select>
+          </div>
+          
+          <div id="referralFields" class="referral-fields" style="display: none;">
+            <div class="form-group">
+              <label class="form-label" for="referrerEmail">Referrer's Email Address *</label>
+              <input type="email" id="referrerEmail" name="referrerEmail" class="form-input" 
+                     placeholder="email@example.com">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="referrerName">Referrer's Name</label>
+              <input type="text" id="referrerName" name="referrerName" class="form-input" 
+                     placeholder="Optional - helps us personalize the thank you">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="howReferred">How did they refer you?</label>
+              <select id="howReferred" name="howReferred" class="form-select">
+                <option value="">Select method</option>
+                <option value="word-of-mouth">Word of mouth</option>
+                <option value="social-media">Social media</option>
+                <option value="email">Email</option>
+                <option value="website">Website/Link</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
         </div>
         
         <div class="loading" id="loadingState">
@@ -892,8 +954,13 @@
           <button type="button" class="btn-cancel" id="successCloseBtn" style="margin-top: 20px; font-size: 12px; padding: 8px 16px;">Close</button>
         </div>
         
-        <div class="form-actions">
+        <div class="form-actions" id="formActions1">
           <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
+          <button type="button" class="btn-submit" id="nextBtn">Next: Referral Info</button>
+        </div>
+        
+        <div class="form-actions" id="formActions2" style="display: none;">
+          <button type="button" class="btn-cancel" id="backBtn">Back</button>
           <button type="submit" class="btn-submit" id="submitBtn">Send Request</button>
         </div>
       </form>
@@ -1122,8 +1189,27 @@
       const EMAILJS_CONFIG = {
         publicKey: 'koG6eWbBRll3MwQU9', // Your EmailJS public key
         serviceId: 'service_0r9aneq', // Your EmailJS service ID
-        templateId: 'template_4uw5t74' // Your EmailJS template ID
+        templateId: 'template_4uw5t74', // Your EmailJS template ID (main inquiry)
+        referralTemplateId: 'template_0gw81ok' // Your EmailJS template ID (referral)
       };
+
+      // Extract referrer email from URL using query parameters
+      function getReferrerFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const referrerEmail = urlParams.get('ref');
+        
+        if (referrerEmail) {
+          // Validate email format
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (emailRegex.test(referrerEmail)) {
+            return referrerEmail;
+          } else {
+            console.warn('Invalid email format in ref parameter:', referrerEmail);
+            return null;
+          }
+        }
+        return null;
+      }
 
       // Initialize EmailJS
       emailjs.init(EMAILJS_CONFIG.publicKey);
@@ -1136,8 +1222,25 @@
       const cancelBtn = $('#cancelBtn');
       const form = $('#helpForm');
       const submitBtn = $('#submitBtn');
+      const nextBtn = $('#nextBtn');
+      const backBtn = $('#backBtn');
       const loadingState = $('#loadingState');
       const successMessage = $('#successMessage');
+      
+      // Form pages
+      const formPage1 = $('#formPage1');
+      const formPage2 = $('#formPage2');
+      const formActions1 = $('#formActions1');
+      const formActions2 = $('#formActions2');
+      const formTitle = $('#formTitle');
+      
+      // Referral elements
+      const wasReferredSelect = $('#wasReferred');
+      const referralFields = $('#referralFields');
+      const referrerEmailInput = $('#referrerEmail');
+      
+      // Current page tracking
+      let currentPage = 1;
       
 
       // Cookie utilities
@@ -1202,6 +1305,85 @@
         });
       }
 
+      // Page navigation functions
+      function goToPage2() {
+        // Validate page 1 first
+        const requiredFields = formPage1.querySelectorAll('[required]');
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+          if (!field.value.trim()) {
+            field.focus();
+            isValid = false;
+            return;
+          }
+        });
+        
+        if (!isValid) {
+          alert('Please fill in all required fields before proceeding.');
+          return;
+        }
+        
+        // Animate to page 2
+        currentPage = 2;
+        formTitle.textContent = 'Referral Information';
+        
+        formPage1.style.display = 'none';
+        formActions1.style.display = 'none';
+        
+        formPage2.style.display = 'block';
+        formActions2.style.display = 'flex';
+        
+        // Check if referrer was provided in URL
+        const urlReferrer = getReferrerFromURL();
+        if (urlReferrer) {
+          wasReferredSelect.value = 'yes';
+          referrerEmailInput.value = urlReferrer;
+          referralFields.style.display = 'block';
+          // Make referrer email required if pre-filled
+          referrerEmailInput.required = true;
+        }
+        
+        // Animate page 2 elements
+        setTimeout(() => {
+          animateFormElements(formPage2);
+        }, 100);
+      }
+      
+      function goToPage1() {
+        currentPage = 1;
+        formTitle.textContent = 'Technical Help Request';
+        
+        formPage2.style.display = 'none';
+        formActions2.style.display = 'none';
+        
+        formPage1.style.display = 'block';
+        formActions1.style.display = 'flex';
+      }
+      
+      // Handle referral field visibility
+      function handleReferralToggle() {
+        const isReferred = wasReferredSelect.value === 'yes';
+        
+        if (isReferred) {
+          referralFields.style.display = 'block';
+          referrerEmailInput.required = true;
+          
+          // If not already filled from URL, focus on email field
+          if (!referrerEmailInput.value) {
+            setTimeout(() => referrerEmailInput.focus(), 300);
+          }
+        } else {
+          referralFields.style.display = 'none';
+          referrerEmailInput.required = false;
+          
+          // Clear referral fields
+          referrerEmailInput.value = '';
+          $('#referrerName').value = '';
+          $('#howReferred').value = '';
+        }
+      }
+
       // Open modal
       function openModal() {
         document.body.style.overflow = 'hidden';
@@ -1220,9 +1402,10 @@
       }
       
       // Animate form elements one by one
-      function animateFormElements() {
-        const formGroups = form.querySelectorAll('.form-group');
-        const formActions = form.querySelector('.form-actions');
+      function animateFormElements(container = form) {
+        const formGroups = container.querySelectorAll('.form-group');
+        const formActions = container.querySelector('.form-actions') || 
+                          (currentPage === 1 ? formActions1 : formActions2);
         
         // Animate each form group with typing effect
         formGroups.forEach((group, index) => {
@@ -1290,9 +1473,16 @@
         successMessage.classList.remove('show');
         submitBtn.disabled = false;
         
+        // Reset to page 1
+        currentPage = 1;
+        formTitle.textContent = 'Technical Help Request';
+        formPage1.style.display = 'block';
+        formPage2.style.display = 'none';
+        formActions1.style.display = 'flex';
+        formActions2.style.display = 'none';
+        
         // Restore form fields
         const formGroups = form.querySelectorAll('.form-group');
-        const formActions = form.querySelector('.form-actions');
         
         formGroups.forEach(group => {
           group.style.opacity = '1';
@@ -1300,11 +1490,16 @@
           group.style.display = '';
         });
         
-        if (formActions) {
-          formActions.style.opacity = '1';
-          formActions.style.pointerEvents = 'auto';
-          formActions.style.display = '';
-        }
+        [formActions1, formActions2].forEach(actions => {
+          if (actions) {
+            actions.style.opacity = '1';
+            actions.style.pointerEvents = 'auto';
+          }
+        });
+        
+        // Reset referral fields
+        referralFields.style.display = 'none';
+        referrerEmailInput.required = false;
         
         // Don't reset form data - keep user input
       }
@@ -1380,6 +1575,21 @@
       function showError(message) {
         loadingState.classList.remove('show');
         submitBtn.disabled = false;
+        
+        // Restore form visibility
+        const formGroups = form.querySelectorAll('.form-group');
+        const formActions = currentPage === 1 ? formActions1 : formActions2;
+        
+        formGroups.forEach(group => {
+          group.style.opacity = '1';
+          group.style.pointerEvents = 'auto';
+        });
+        
+        if (formActions) {
+          formActions.style.opacity = '1';
+          formActions.style.pointerEvents = 'auto';
+        }
+        
         alert('Error: ' + message + '\n\nPlease try again or contact russoc2023@fau.edu directly.');
       }
 
@@ -1459,6 +1669,24 @@ Submitted: ${new Date().toLocaleString()}`
         };
       }
 
+      // Format referral email data
+      function formatReferralData(formData) {
+        const clientName = formData.get('name') || '';
+        const referrerEmail = formData.get('referrerEmail') || '';
+        const referrerName = formData.get('referrerName') || referrerEmail;
+        
+        return {
+          to_name: referrerName,
+          to_email: referrerEmail,
+          from_name: clientName,
+          from_email: 'russoc2023@fau.edu',
+          reply_to: 'russoc2023@fau.edu',
+          client_name: clientName,
+          referrer_name: referrerName,
+          timestamp: new Date().toLocaleString()
+        };
+      }
+
       // Submit form
       async function submitForm(e) {
         e.preventDefault();
@@ -1473,21 +1701,41 @@ Submitted: ${new Date().toLocaleString()}`
 
         try {
           const formData = new FormData(form);
-          const templateParams = formatFormData(formData);
+          const isReferred = formData.get('wasReferred') === 'yes';
+          const referrerEmail = formData.get('referrerEmail');
+          
+          // Validate referral info if user said they were referred
+          if (isReferred && !referrerEmail) {
+            showError('Please provide the referrer\'s email address.');
+            return;
+          }
 
-          // Use manual send method with proper parameter mapping
-          const response = await emailjs.send(
+          // Send main inquiry email
+          const templateParams = formatFormData(formData);
+          const mainResponse = await emailjs.send(
             EMAILJS_CONFIG.serviceId,
             EMAILJS_CONFIG.templateId,
             templateParams,
             EMAILJS_CONFIG.publicKey
           );
 
+          // Send referral thank you email if applicable
+          if (isReferred && referrerEmail) {
+            const referralParams = formatReferralData(formData);
+            const referralResponse = await emailjs.send(
+              EMAILJS_CONFIG.serviceId,
+              EMAILJS_CONFIG.referralTemplateId,
+              referralParams,
+              EMAILJS_CONFIG.publicKey
+            );
+            
+            console.log('Referral email sent:', referralResponse);
+          }
           
-          if (response.status === 200 || response.text === 'OK') {
+          if (mainResponse.status === 200 || mainResponse.text === 'OK') {
             showSuccess();
           } else {
-            throw new Error('Email service returned status: ' + response.status);
+            throw new Error('Email service returned status: ' + mainResponse.status);
           }
         } catch (error) {
           showError(error.text || error.message || 'Failed to send email. Please try again or contact us directly.');
@@ -1498,6 +1746,9 @@ Submitted: ${new Date().toLocaleString()}`
       openBtn.addEventListener('click', openModal);
       closeBtn.addEventListener('click', closeModal);
       cancelBtn.addEventListener('click', closeModal);
+      nextBtn.addEventListener('click', goToPage2);
+      backBtn.addEventListener('click', goToPage1);
+      wasReferredSelect.addEventListener('change', handleReferralToggle);
       form.addEventListener('submit', submitForm);
       
       // Add success close button listener
