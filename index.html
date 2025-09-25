@@ -234,6 +234,10 @@
       transition-delay: 0.8s;
     }
     
+    .actions > *:nth-child(3) {
+      transition-delay: 1.0s;
+    }
+    
     .card.show .actions > * {
       opacity: 1;
       transform: translateY(0);
@@ -714,6 +718,209 @@
       height: auto;
     }
 
+    /* Affiliate Modal Styles */
+    .affiliate-modal {
+      position: fixed; inset: 0; z-index: 20;
+      display: grid; place-items: center; padding: 20px;
+      background: rgba(0,0,0,0);
+      backdrop-filter: blur(0px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1), 
+                  background-color 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  backdrop-filter 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  visibility 0s linear 0.5s;
+    }
+    
+    .affiliate-modal.show { 
+      opacity: 1;
+      visibility: visible;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1), 
+                  background-color 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  backdrop-filter 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .affiliate-container {
+      width: min(600px, 100%); max-height: 90vh; overflow-y: auto;
+      background: var(--bg-form);
+      border: 2px solid var(--border-form);
+      border-radius: 12px;
+      padding: clamp(16px, 3vw, 24px);
+      box-shadow: 
+        0 30px 100px rgba(0,255,65,0.25),
+        0 10px 40px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(0,255,65,0.1);
+      position: relative;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      opacity: 0;
+      transform: scale(0.7) translateY(60px);
+      transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform, opacity;
+    }
+    
+    .affiliate-modal.show .affiliate-container {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    
+    .affiliate-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; padding-bottom: 12px;
+      border-bottom: 1px solid #00ff41;
+    }
+    
+    .affiliate-title {
+      font-size: clamp(16px, 3vw, 20px);
+      color: var(--text-hero); margin: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      text-shadow: var(--shadow-glow);
+      letter-spacing: 1px;
+    }
+    
+    .affiliate-title:before { content: "> "; }
+    
+    .affiliate-content {
+      text-align: center;
+    }
+    
+    .affiliate-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    
+    .affiliate-content h3 {
+      color: var(--text-hero);
+      font-size: clamp(18px, 3vw, 24px);
+      margin: 0 0 16px 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      text-shadow: var(--shadow-glow);
+    }
+    
+    .affiliate-content p {
+      color: var(--text-secondary);
+      font-size: clamp(14px, 2vw, 16px);
+      line-height: 1.5;
+      margin: 0 0 24px 0;
+    }
+    
+    .affiliate-link-container {
+      margin: 24px 0;
+      text-align: left;
+    }
+    
+    .link-display {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    
+    .affiliate-link-text {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border-form);
+      color: var(--text-hero);
+      font-size: 12px;
+      padding: 8px 12px;
+      border-radius: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      box-shadow: inset 0 0 10px var(--accent-dim);
+      word-break: break-all;
+      line-height: 1.4;
+      min-height: 20px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .btn-copy {
+      background: var(--btn-form-bg);
+      border: 1px solid var(--btn-form-border);
+      color: var(--text-hero);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 700; font-size: 12px;
+      cursor: pointer; transition: all 0.3s;
+      padding: 8px 16px;
+      white-space: nowrap;
+    }
+    
+    .btn-copy:hover {
+      background: var(--btn-form-hover);
+      box-shadow: var(--shadow-glow);
+    }
+    
+    .affiliate-terms {
+      background: var(--bg-input);
+      border: 1px solid var(--accent-border);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 24px 0;
+      text-align: left;
+    }
+    
+    .affiliate-terms h4 {
+      color: var(--text-hero);
+      font-size: 16px;
+      margin: 0 0 12px 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    
+    .affiliate-terms ul {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0;
+      padding-left: 20px;
+    }
+    
+    .affiliate-terms li {
+      margin-bottom: 8px;
+    }
+    
+    .affiliate-terms a {
+      color: var(--text-hero);
+      text-decoration: underline;
+    }
+    
+    .affiliate-terms a:hover {
+      color: var(--accent-primary);
+    }
+    
+    /* Affiliate form animation states (same as client form) */
+    #affiliateForm .form-group {
+      transform: translateX(-40px);
+      opacity: 0;
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    #affiliateForm .form-group.animate-in {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    
+    #affiliateForm .form-label {
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: all 0.4s ease-out;
+    }
+    
+    #affiliateForm .form-label.animate-in {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    #affiliateForm .form-input {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    #affiliateForm .form-input.animate-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     /* Mobile Responsive Form */
     @media (max-width: 768px){
       #formModal{ padding: 12px; }
@@ -737,6 +944,19 @@
         font-size: 13px;
       }
       .form-group{ margin-bottom: 12px; }
+      
+      /* Affiliate Modal Mobile */
+      .affiliate-modal { padding: 12px; }
+      .affiliate-container {
+        width: 100%; max-height: 95vh;
+        padding: 16px;
+        font-size: 12px;
+      }
+      .affiliate-title { font-size: 16px; }
+      .affiliate-content h3 { font-size: 18px; }
+      .affiliate-content p { font-size: 14px; }
+      .link-display { flex-direction: column; }
+      .btn-copy { width: 100%; }
     }
 
     @media (max-width: 480px){
@@ -799,6 +1019,7 @@
       </p>
       <div class="actions">
         <button class="btn" id="openFormBtn" type="button">Fill out Your Inquiry Here</button>
+        <button class="btn btn-affiliate" id="openAffiliateBtn" type="button">Become an Affiliate</button>
         <a class="email" href="mailto:russoc2023@fau.edu" aria-label="Email russoc2023 at fau dot edu">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="1.6"/>
@@ -919,6 +1140,69 @@
         <img src="media/qr-code2.png" alt="QR Code" width="200" height="200">
       </div>
       <p>Scan this QR code with your phone's camera to visit this website</p>
+    </div>
+  </div>
+
+  <!-- Affiliate Modal -->
+  <div id="affiliateModal" class="affiliate-modal" aria-hidden="true">
+    <div class="affiliate-container" role="dialog" aria-labelledby="affiliateTitle">
+      <div class="affiliate-header">
+        <h2 id="affiliateTitle" class="affiliate-title">Become an Affiliate</h2>
+        <button class="close-btn" id="closeAffiliateBtn" type="button" aria-label="Close affiliate form">&times;</button>
+      </div>
+      
+      <!-- Step 1: Email Input -->
+      <div class="affiliate-step" id="affiliateStep1">
+        <div class="affiliate-content">
+          <div class="affiliate-icon">💰</div>
+          <h3>Get Rewarded for Referrals!</h3>
+          <p>Would you like to get rewarded for referring people to our technical services? Type your email below to get your personalized affiliate link.</p>
+          
+          <form id="affiliateForm">
+            <div class="form-group">
+              <label class="form-label" for="affiliateEmail">Your Email Address *</label>
+              <input type="email" id="affiliateEmail" name="affiliateEmail" class="form-input" 
+                     placeholder="your.email@example.com" required>
+            </div>
+            
+            <div class="form-actions">
+              <button type="button" class="btn-cancel" id="cancelAffiliateBtn">Cancel</button>
+              <button type="submit" class="btn-submit" id="generateLinkBtn">Generate My Link</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Step 2: Success with Link -->
+      <div class="affiliate-step" id="affiliateStep2" style="display: none;">
+        <div class="affiliate-content">
+          <div class="affiliate-icon">🎉</div>
+          <h3>Welcome to the Affiliate Program!</h3>
+          <p>Thank you for becoming an affiliate of Charlie Russo Technical Services. When you send the link below to someone who requires technical freelancing, you will get an email when they submit an inquiry.</p>
+          
+          <div class="affiliate-link-container">
+            <label class="form-label">Your Affiliate Link:</label>
+            <div class="link-display">
+              <div id="generatedLink" class="affiliate-link-text"></div>
+              <button type="button" class="btn-copy" id="copyLinkBtn">Copy</button>
+            </div>
+          </div>
+          
+          <div class="affiliate-terms">
+            <h4>What happens next?</h4>
+            <ul>
+              <li>We'll keep you updated on whether they follow through with the process</li>
+              <li>You will receive a percentage of our profit</li>
+              <li>To negotiate this amount, please email <a href="mailto:russoc2023@fau.edu">russoc2023@fau.edu</a></li>
+            </ul>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" id="closeAffiliateSuccessBtn">Close</button>
+            <button type="button" class="btn-submit" id="shareLinkBtn">Share Link</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1129,6 +1413,18 @@
 
       // Initialize EmailJS
       emailjs.init(EMAILJS_CONFIG.publicKey);
+      
+      // SECURITY CHECK: Ensure client and referral services are different
+      if (EMAILJS_CONFIG.serviceId === EMAILJS_CONFIG.referralServiceId) {
+        console.error('🚨 CRITICAL SECURITY ISSUE: Client and referral services are the same!');
+        console.error('🚨 This could cause sensitive client data to be sent to referrers!');
+        console.error('🚨 Client Service ID:', EMAILJS_CONFIG.serviceId);
+        console.error('🚨 Referral Service ID:', EMAILJS_CONFIG.referralServiceId);
+      } else {
+        console.log('✅ Security check passed: Client and referral services are different');
+        console.log('✅ Client Service ID:', EMAILJS_CONFIG.serviceId);
+        console.log('✅ Referral Service ID:', EMAILJS_CONFIG.referralServiceId);
+      }
 
       // ===== Referral System =====
       const REFERRAL_COOKIE_NAME = 'techHelpReferrer';
@@ -1217,6 +1513,35 @@
         console.log('Are they different?', EMAILJS_CONFIG.serviceId !== EMAILJS_CONFIG.referralServiceId);
       };
 
+      // NEW: Function to help diagnose EmailJS configuration issues
+      window.checkEmailJSConfig = function() {
+        console.log('🔍 EMAILJS CONFIGURATION CHECK:');
+        console.log('=====================================');
+        console.log('Public Key:', EMAILJS_CONFIG.publicKey);
+        console.log('Client Service ID:', EMAILJS_CONFIG.serviceId);
+        console.log('Referral Service ID:', EMAILJS_CONFIG.referralServiceId);
+        console.log('Client Template ID:', EMAILJS_CONFIG.templateId);
+        console.log('Referral Template ID:', EMAILJS_CONFIG.referralTemplateId);
+        console.log('=====================================');
+        
+        // Check for common configuration issues
+        if (EMAILJS_CONFIG.serviceId === EMAILJS_CONFIG.referralServiceId) {
+          console.error('🚨 ISSUE: Client and referral services are the same!');
+        }
+        
+        if (EMAILJS_CONFIG.templateId === EMAILJS_CONFIG.referralTemplateId) {
+          console.error('🚨 ISSUE: Client and referral templates are the same!');
+        }
+        
+        console.log('📋 NEXT STEPS:');
+        console.log('1. Go to your EmailJS dashboard');
+        console.log('2. Check that service_0r9aneq is configured to send emails TO russoc2023@fau.edu');
+        console.log('3. Check that service_3uom8fe is configured to send emails TO the referrer email');
+        console.log('4. Verify that template_4uw5t74 uses the client.md template');
+        console.log('5. Verify that template_0gw81ok uses the refer.md template');
+        console.log('6. Make sure each service has the correct "To Email" configuration');
+      };
+
       // Debug function to test referral service directly
       window.testReferralService = async function() {
         console.log('🧪 Testing referral service directly...');
@@ -1243,6 +1568,78 @@
         } catch (error) {
           console.error('❌ Test referral email failed:', error);
         }
+      };
+
+      // NEW: Diagnostic function to test EmailJS services in isolation
+      window.diagnoseEmailJS = async function() {
+        console.log('🔍 DIAGNOSTIC: Testing EmailJS services in isolation...');
+        
+        // Test 1: Send ONLY client email
+        console.log('🧪 TEST 1: Sending ONLY client email...');
+        const clientOnlyParams = {
+          to_name: 'Charlie Russo',
+          to_email: 'russoc2023@fau.edu',
+          from_name: 'Diagnostic Test',
+          from_email: 'test@example.com',
+          reply_to: 'test@example.com',
+          name: 'Diagnostic Test',
+          email: 'test@example.com',
+          phone: 'Test Phone',
+          urgency: 'medium',
+          category: 'web',
+          description: 'This is a diagnostic test - client email only',
+          device: 'test.com',
+          project_budget: '100-500 USD',
+          project_category: 'Website Development',
+          project_description: 'This is a diagnostic test - client email only',
+          existing_website: 'test.com',
+          client_name: 'Diagnostic Test',
+          client_email: 'test@example.com',
+          timestamp: new Date().toLocaleString()
+        };
+        
+        try {
+          const clientResponse = await emailjs.send(
+            EMAILJS_CONFIG.serviceId,
+            EMAILJS_CONFIG.templateId,
+            clientOnlyParams,
+            EMAILJS_CONFIG.publicKey
+          );
+          console.log('✅ CLIENT EMAIL ONLY sent successfully:', clientResponse);
+          console.log('🔍 Check if referrer received this email (they should NOT)');
+        } catch (error) {
+          console.error('❌ Client email failed:', error);
+        }
+        
+        // Wait 2 seconds between tests
+        setTimeout(async () => {
+          // Test 2: Send ONLY referral email
+          console.log('🧪 TEST 2: Sending ONLY referral email...');
+          const referralOnlyParams = {
+            to_name: 'Test Referrer',
+            to_email: 'therealjesusman@gmail.com',
+            from_name: 'Charlie Russo',
+            from_email: 'russoc2023@fau.edu',
+            reply_to: 'russoc2023@fau.edu',
+            email2: 'therealjesusman@gmail.com',
+            from_email2: 'therealjesusman@gmail.com',
+            from_name: 'Diagnostic Test Client',
+            timestamp: new Date().toLocaleString()
+          };
+          
+          try {
+            const referralResponse = await emailjs.send(
+              EMAILJS_CONFIG.referralServiceId,
+              EMAILJS_CONFIG.referralTemplateId,
+              referralOnlyParams,
+              EMAILJS_CONFIG.publicKey
+            );
+            console.log('✅ REFERRAL EMAIL ONLY sent successfully:', referralResponse);
+            console.log('🔍 Check if referrer received this email (they SHOULD)');
+          } catch (error) {
+            console.error('❌ Referral email failed:', error);
+          }
+        }, 2000);
       };
 
       // Debug function to manually check cookie
@@ -1535,10 +1932,10 @@
         const website = formData.get('device') || 'Not provided';
         
         return {
-          // Email routing
+          // Email routing - CLIENT EMAIL ONLY GOES TO CHARLIE
           to_name: 'Charlie Russo',
           to_email: 'russoc2023@fau.edu',
-          // cc_email: 'russoc2023@fau.edu', // Removed CC to test
+          // NO CC - this ensures only Charlie gets the detailed client email
           
           // Client information
           from_name: name,
@@ -1591,7 +1988,7 @@ Submitted: ${new Date().toLocaleString()}`
         const referrerName = referrerEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         
         return {
-          // Email routing for referrer
+          // Email routing for referrer - REFERRAL EMAIL ONLY GOES TO REFERRER
           to_name: referrerName,
           to_email: referrerEmail,
           from_name: 'Charlie Russo',
@@ -1601,8 +1998,16 @@ Submitted: ${new Date().toLocaleString()}`
           // EmailJS template variables (matching your template configuration)
           email2: referrerEmail, // This is what your template expects for recipient
           from_email2: referrerEmail, // Alternative variable name for referral email
-          from_name: name, // Client's name
+          from_name: name, // Client's name (safe to share - just the name)
           timestamp: new Date().toLocaleString()
+          
+          // NOTE: This template does NOT include sensitive client information like:
+          // - Client email address
+          // - Phone number
+          // - Project budget
+          // - Detailed project description
+          // - Website information
+          // Only the client's name is shared as a thank you
         };
       }
 
@@ -1627,7 +2032,9 @@ Submitted: ${new Date().toLocaleString()}`
           console.log('🔍 Sending client email with service:', EMAILJS_CONFIG.serviceId);
           console.log('🔍 Client template params:', clientTemplateParams);
           console.log('🔍 CRITICAL: Client email should go TO:', clientTemplateParams.to_email);
-          console.log('🔍 CRITICAL: Client email CC:', clientTemplateParams.cc_email);
+          console.log('🔍 CRITICAL: Client email FROM:', clientTemplateParams.from_email);
+          console.log('🔍 CRITICAL: Client email REPLY_TO:', clientTemplateParams.reply_to);
+          console.log('🔍 SECURITY: Client email contains sensitive data - should ONLY go to Charlie');
           
           const clientResponse = await emailjs.send(
             EMAILJS_CONFIG.serviceId,
@@ -1649,8 +2056,22 @@ Submitted: ${new Date().toLocaleString()}`
           
           if (referrerEmail && isValidEmail(referrerEmail)) {
             console.log('✅ Referrer found! Sending referral email...');
+            console.log('🔍 SECURITY CHECK: Verifying referral email does not contain sensitive client data...');
+            
             try {
               const referralTemplateParams = formatReferralData(formData, referrerEmail);
+              
+              // SECURITY CHECK: Ensure referral email doesn't contain sensitive data
+              const sensitiveFields = ['email', 'phone', 'description', 'device', 'project_budget', 'project_description', 'existing_website'];
+              const hasSensitiveData = sensitiveFields.some(field => referralTemplateParams[field]);
+              
+              if (hasSensitiveData) {
+                console.error('🚨 SECURITY VIOLATION: Referral email contains sensitive client data!');
+                console.error('🚨 Sensitive fields found:', sensitiveFields.filter(field => referralTemplateParams[field]));
+                throw new Error('Security violation: Referral email contains sensitive client data');
+              } else {
+                console.log('✅ Security check passed: Referral email contains no sensitive client data');
+              }
               
               // Send referral thank you email
               console.log('🔍 Sending referral email with template:', EMAILJS_CONFIG.referralTemplateId);
@@ -1662,6 +2083,7 @@ Submitted: ${new Date().toLocaleString()}`
               console.log('🔍 CRITICAL: From_email2 (referral email):', referralTemplateParams.from_email2);
               console.log('🔍 CRITICAL: Client name (from_name):', referralTemplateParams.from_name);
               console.log('🔍 CRITICAL: Timestamp:', referralTemplateParams.timestamp);
+              console.log('🔍 SECURITY: Referral email contains NO sensitive data - only client name and thank you message');
               
               const referralResponse = await emailjs.send(
                 EMAILJS_CONFIG.referralServiceId,
@@ -1759,6 +2181,290 @@ Submitted: ${new Date().toLocaleString()}`
       window.addEventListener('beforeunload', saveFormData);
       setupAutoSave();
       document.addEventListener('DOMContentLoaded', loadFormData);
+    })();
+
+    // ===== Affiliate Modal =====
+    (function affiliateHandler() {
+      // Modal elements
+      const affiliateModal = $('#affiliateModal');
+      const openAffiliateBtn = $('#openAffiliateBtn');
+      const closeAffiliateBtn = $('#closeAffiliateBtn');
+      const cancelAffiliateBtn = $('#cancelAffiliateBtn');
+      const closeAffiliateSuccessBtn = $('#closeAffiliateSuccessBtn');
+      const affiliateForm = $('#affiliateForm');
+      const generateLinkBtn = $('#generateLinkBtn');
+      const copyLinkBtn = $('#copyLinkBtn');
+      const shareLinkBtn = $('#shareLinkBtn');
+      const affiliateEmail = $('#affiliateEmail');
+      const generatedLink = $('#generatedLink');
+      const affiliateStep1 = $('#affiliateStep1');
+      const affiliateStep2 = $('#affiliateStep2');
+
+      // Open affiliate modal
+      function openAffiliateModal() {
+        document.body.style.overflow = 'hidden';
+        affiliateModal.setAttribute('aria-hidden', 'false');
+        
+        // Reset to step 1
+        affiliateStep1.style.display = 'block';
+        affiliateStep2.style.display = 'none';
+        affiliateForm.reset();
+        
+        // Trigger smooth fade in
+        requestAnimationFrame(() => {
+          affiliateModal.classList.add('show');
+          
+          // Animate form elements after container appears (same as client form)
+          setTimeout(() => {
+            animateAffiliateFormElements();
+          }, 700); // Wait for form container to fully appear
+        });
+      }
+      
+      // Animate affiliate form elements (same as client form)
+      function animateAffiliateFormElements() {
+        const formGroups = affiliateForm.querySelectorAll('.form-group');
+        const formActions = affiliateForm.querySelector('.form-actions');
+        
+        // Animate each form group with typing effect
+        formGroups.forEach((group, index) => {
+          setTimeout(() => {
+            // Animate the group container
+            group.classList.add('animate-in');
+            
+            // Animate label and input separately
+            const label = group.querySelector('.form-label');
+            const input = group.querySelector('.form-input');
+            
+            if (label) {
+              setTimeout(() => {
+                label.classList.add('animate-in');
+              }, 200);
+            }
+            
+            if (input) {
+              setTimeout(() => {
+                input.classList.add('animate-in');
+                
+                // Focus first empty field
+                if (index === 0) {
+                  setTimeout(() => {
+                    affiliateEmail.focus();
+                  }, 300);
+                }
+              }, 400);
+            }
+          }, index * 300); // Stagger each group by 300ms
+        });
+        
+        // Animate form actions last
+        if (formActions) {
+          setTimeout(() => {
+            formActions.style.opacity = '0';
+            formActions.style.transform = 'translateY(20px)';
+            formActions.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+            
+            requestAnimationFrame(() => {
+              formActions.style.opacity = '1';
+              formActions.style.transform = 'translateY(0)';
+            });
+          }, formGroups.length * 300 + 200);
+        }
+      }
+
+      // Close affiliate modal
+      function closeAffiliateModal() {
+        affiliateModal.classList.remove('show');
+        affiliateModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        
+        // Wait for fade out animation to complete
+        setTimeout(() => {
+          // Reset to step 1
+          affiliateStep1.style.display = 'block';
+          affiliateStep2.style.display = 'none';
+          affiliateForm.reset();
+        }, 500);
+      }
+
+      // Generate affiliate link
+      function generateAffiliateLink(email) {
+        // Get current domain - use the actual domain or fallback to current origin
+        let currentDomain = window.location.origin;
+        
+        // If you want to use a specific domain instead of the current one, replace this:
+        // currentDomain = 'https://charlierusso.dev';
+        
+        const affiliateLink = `${currentDomain}?ref=${encodeURIComponent(email)}`;
+        console.log('🔗 Generated affiliate link:', affiliateLink);
+        return affiliateLink;
+      }
+      
+      // Display affiliate link with proper formatting
+      function displayAffiliateLink(email, link) {
+        // Create a user-friendly display version
+        const displayText = `${window.location.origin}?ref=${email}`;
+        console.log('🔗 Display text:', displayText);
+        return displayText;
+      }
+
+      // Copy link to clipboard
+      async function copyToClipboard(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          
+          // Show success feedback
+          const originalText = copyLinkBtn.textContent;
+          copyLinkBtn.textContent = 'Copied!';
+          copyLinkBtn.style.background = 'var(--status-success)';
+          
+          setTimeout(() => {
+            copyLinkBtn.textContent = originalText;
+            copyLinkBtn.style.background = 'var(--btn-form-bg)';
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy: ', err);
+          
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = text;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          
+          // Show success feedback
+          const originalText = copyLinkBtn.textContent;
+          copyLinkBtn.textContent = 'Copied!';
+          copyLinkBtn.style.background = 'var(--status-success)';
+          
+          setTimeout(() => {
+            copyLinkBtn.textContent = originalText;
+            copyLinkBtn.style.background = 'var(--btn-form-bg)';
+          }, 2000);
+        }
+      }
+
+      // Share link
+      function shareLink() {
+        // Use the actual encoded link for sharing (stored in dataset)
+        const link = generatedLink.dataset.actualLink || generatedLink.textContent;
+        
+        if (navigator.share) {
+          // Use native sharing if available
+          navigator.share({
+            title: 'Charlie Russo Technical Services - Affiliate Link',
+            text: 'Check out Charlie Russo Technical Services for development and prototyping needs!',
+            url: link
+          }).catch(err => {
+            console.log('Error sharing:', err);
+            copyToClipboard(link);
+          });
+        } else {
+          // Fallback to copying
+          copyToClipboard(link);
+        }
+      }
+
+      // Handle form submission
+      function handleAffiliateForm(e) {
+        e.preventDefault();
+        
+        const email = affiliateEmail.value.trim();
+        
+        if (!email || !isValidEmail(email)) {
+          alert('Please enter a valid email address.');
+          return;
+        }
+        
+        // Generate affiliate link (encoded for actual use)
+        const link = generateAffiliateLink(email);
+        console.log('🔍 Generated encoded link:', link);
+        
+        // Create display version (with proper @ symbol)
+        const displayLink = displayAffiliateLink(email, link);
+        console.log('🔍 Display link:', displayLink);
+        
+        // Set the display text content
+        generatedLink.textContent = displayLink;
+        
+        // Store the actual encoded link for copying
+        generatedLink.dataset.actualLink = link;
+        
+        // Verify the link was set
+        console.log('🔍 Link text content after setting:', generatedLink.textContent);
+        
+        // Show step 2
+        affiliateStep1.style.display = 'none';
+        affiliateStep2.style.display = 'block';
+        
+        // Log affiliate signup (for your tracking)
+        console.log('🎯 New affiliate signup:', email);
+        console.log('🔗 Generated affiliate link:', link);
+      }
+
+      // Email validation helper
+      function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      }
+
+      // Event listeners
+      openAffiliateBtn.addEventListener('click', openAffiliateModal);
+      closeAffiliateBtn.addEventListener('click', closeAffiliateModal);
+      cancelAffiliateBtn.addEventListener('click', closeAffiliateModal);
+      closeAffiliateSuccessBtn.addEventListener('click', closeAffiliateModal);
+      affiliateForm.addEventListener('submit', handleAffiliateForm);
+      copyLinkBtn.addEventListener('click', () => {
+        // Use the actual encoded link for copying (stored in dataset)
+        const actualLink = generatedLink.dataset.actualLink || generatedLink.textContent;
+        copyToClipboard(actualLink);
+      });
+      shareLinkBtn.addEventListener('click', shareLink);
+
+      // Close modal when clicking outside
+      affiliateModal.addEventListener('click', (e) => {
+        if (e.target === affiliateModal) closeAffiliateModal();
+      });
+
+      // Close modal with Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (affiliateModal.classList.contains('show')) {
+            closeAffiliateModal();
+          }
+        }
+      });
+
+      // Debug function to test affiliate link generation
+      window.testAffiliateLink = function(email) {
+        if (!email) email = 'test@example.com';
+        const link = generateAffiliateLink(email);
+        console.log('🧪 Test affiliate link for', email, ':', link);
+        console.log('🧪 Current domain:', window.location.origin);
+        console.log('🧪 Generated link:', link);
+        return link;
+      };
+      
+      // Debug function to test the full affiliate flow
+      window.testAffiliateFlow = function(email) {
+        if (!email) email = 'test@example.com';
+        console.log('🧪 Testing full affiliate flow with email:', email);
+        
+        // Test link generation
+        const link = generateAffiliateLink(email);
+        console.log('🧪 Generated link:', link);
+        
+        // Test setting the link in the text element
+        if (generatedLink) {
+          generatedLink.textContent = link;
+          console.log('🧪 Link set in text element:', generatedLink.textContent);
+        } else {
+          console.log('🧪 Generated link element not found');
+        }
+        
+        return link;
+      };
     })();
   </script>
 </body>
