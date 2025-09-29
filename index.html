@@ -25,6 +25,8 @@
   <meta property="twitter:image:alt" content="Technical Help Services - Charles Russo" />
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <!-- QR Code Styling library -->
+  <script src="https://unpkg.com/qr-code-styling@1.9.2/lib/qr-code-styling.js"></script>
   <style>
     :root{
       /* Background Colors */
@@ -654,11 +656,11 @@
       background: var(--bg-card);
       border: 2px solid var(--accent-border);
       border-radius: 12px;
-      padding: 32px;
+      padding: 24px;
       position: relative;
       text-align: center;
       max-width: 90%;
-      width: 320px;
+      width: 360px;
       transform: scale(0.95);
       opacity: 0;
       transition: all 0.3s ease;
@@ -713,9 +715,62 @@
       line-height: 0;
     }
 
-    #qrCode img {
-      max-width: 200px;
+    #qrCode {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 280px;
+    }
+
+    #qrCode svg {
+      max-width: 100%;
       height: auto;
+    }
+
+    /* QR Code Animation Styles */
+    #qrCode svg rect,
+    #qrCode svg path,
+    #qrCode svg circle,
+    #qrCode svg polygon {
+      opacity: 0;
+      transform: scale(0.8);
+      animation: sectionFadeIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      transform-origin: center;
+    }
+
+    @keyframes sectionFadeIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Mobile responsiveness for QR code */
+    @media (max-width: 480px) {
+      .qr-container {
+        width: 95%;
+        padding: 20px;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      
+      #qrCode {
+        min-height: 240px;
+      }
+      
+      .qr-container h3 {
+        font-size: 18px;
+        margin-bottom: 16px;
+      }
+      
+      .qr-container p {
+        font-size: 13px;
+        margin-top: 16px;
+      }
     }
 
     /* Affiliate Modal Styles */
@@ -1137,9 +1192,9 @@
       <button type="button" class="qr-close" id="closeQrBtn" aria-label="Close QR Code">×</button>
       <h3>Scan to Visit</h3>
       <div id="qrCode">
-        <img src="media/qr-code2.png" alt="QR Code" width="200" height="200">
+        <!-- Dynamic QR code will be generated here -->
       </div>
-      <p>Scan this QR code with your phone's camera to visit this website</p>
+      <p id="qrDescription">Scan this QR code with your phone's camera to visit this website</p>
     </div>
   </div>
 
@@ -1465,6 +1520,18 @@
 
       // Initialize referral tracking on page load
       handleReferralTracking();
+
+      // Function to update QR code when referral is detected
+      function updateQRCodeForReferral() {
+        const referrerEmail = getReferrer();
+        if (referrerEmail && isValidEmail(referrerEmail)) {
+          console.log('🔄 Updating QR code for referral:', referrerEmail);
+          // Regenerate QR code if modal is open
+          if (qrCodeInstance && qrModal.classList.contains('show')) {
+            generateQRCode();
+          }
+        }
+      }
 
       // Debug function to check current referrer (for testing)
       window.checkReferrer = function() {
@@ -2151,8 +2218,152 @@ Submitted: ${new Date().toLocaleString()}`
       const qrButton = $('#qrButton');
       const qrModal = $('#qrModal');
       const closeQrBtn = $('#closeQrBtn');
+      const qrCodeContainer = $('#qrCode');
+      const qrDescription = $('#qrDescription');
+
+      // Dynamic QR Code instance
+      let qrCodeInstance = null;
+      
+      // Animation configuration
+      const QR_ANIMATION_CONFIG = {
+        sections: 20, // Number of sections to split QR code into
+        delayBetweenSections: 0.1, // Seconds between each section (100ms)
+        animationDuration: 0.6, // Duration of each section's animation (600ms)
+        staggerWithinSection: 0.02 // Small stagger within each section (20ms)
+      };
+
+      // Generate QR code with current URL (including referral if present)
+      function generateQRCode() {
+        // Get current URL with all parameters
+        const currentUrl = window.location.href;
+        const urlParams = new URLSearchParams(window.location.search);
+        const referrerEmail = urlParams.get('ref');
+        
+        // Update description based on whether it's a referral link
+        if (referrerEmail && isValidEmail(referrerEmail)) {
+          qrDescription.textContent = `Scan this QR code to visit with referral from ${referrerEmail}`;
+        } else {
+          qrDescription.textContent = 'Scan this QR code with your phone\'s camera to visit this website';
+        }
+
+        // Clear existing QR code
+        if (qrCodeInstance) {
+          qrCodeInstance.clear();
+        }
+
+        // Clear container to reset animation
+        qrCodeContainer.innerHTML = '';
+
+        // Determine QR code size based on screen size
+        const isMobile = window.innerWidth <= 480;
+        const qrSize = isMobile ? 240 : 280;
+
+        // Create new QR code instance with updated styling
+        qrCodeInstance = new QRCodeStyling({
+          width: qrSize, // Responsive QR code size
+          height: qrSize, // Responsive QR code size
+          data: currentUrl,
+          margin: 6, // Smaller margin
+          type: 'svg',
+          backgroundOptions: { 
+            color: 'transparent' // Transparent background
+          },
+          dotsOptions: { 
+            type: 'classy-rounded', // Classy rounded dots
+            color: '#00ff41' // Same green color for all elements
+          },
+          cornersSquareOptions: { 
+            type: 'square', // Square corner squares
+            color: '#00ff41' // Same green color
+          },
+          cornersDotOptions: { 
+            type: 'square', // Square corner dots
+            color: '#00ff41' // Same green color
+          },
+          imageOptions: { 
+            crossOrigin: 'anonymous', 
+            margin: 6, 
+            imageSize: 0.25, 
+            hideBackgroundDots: false 
+          }
+        });
+
+        // Generate QR code in background first
+        qrCodeInstance.append(qrCodeContainer);
+        
+        // Wait for SVG to be fully rendered, then animate by sections
+        setTimeout(() => {
+          const qrSvg = qrCodeContainer.querySelector('svg');
+          if (qrSvg) {
+            // Get all drawable elements from the SVG
+            const rects = Array.from(qrSvg.querySelectorAll('rect'));
+            const paths = Array.from(qrSvg.querySelectorAll('path'));
+            const circles = Array.from(qrSvg.querySelectorAll('circle'));
+            const polygons = Array.from(qrSvg.querySelectorAll('polygon'));
+            
+            // Combine all elements
+            const allElements = [...rects, ...paths, ...circles, ...polygons];
+            
+            if (allElements.length === 0) {
+              console.log('⚠️ No QR code elements found');
+              return;
+            }
+            
+            // Get SVG dimensions to calculate sections
+            const svgRect = qrSvg.getBoundingClientRect();
+            const svgWidth = svgRect.width;
+            const svgHeight = svgRect.height;
+            
+            // Create sections based on grid
+            const sectionsPerRow = Math.ceil(Math.sqrt(QR_ANIMATION_CONFIG.sections));
+            const sectionsPerCol = Math.ceil(QR_ANIMATION_CONFIG.sections / sectionsPerRow);
+            const sectionWidth = svgWidth / sectionsPerRow;
+            const sectionHeight = svgHeight / sectionsPerCol;
+            
+            // Group elements by sections
+            const sections = Array.from({ length: QR_ANIMATION_CONFIG.sections }, () => []);
+            
+            allElements.forEach(element => {
+              // Get element position
+              const bbox = element.getBBox();
+              const centerX = bbox.x + bbox.width / 2;
+              const centerY = bbox.y + bbox.height / 2;
+              
+              // Determine which section this element belongs to
+              const sectionX = Math.floor(centerX / sectionWidth);
+              const sectionY = Math.floor(centerY / sectionHeight);
+              const sectionIndex = Math.min(sectionY * sectionsPerRow + sectionX, QR_ANIMATION_CONFIG.sections - 1);
+              
+              sections[sectionIndex].push(element);
+            });
+            
+            // Animate sections with proper timing
+            sections.forEach((sectionElements, sectionIndex) => {
+              if (sectionElements.length === 0) return;
+              
+              const sectionDelay = sectionIndex * QR_ANIMATION_CONFIG.delayBetweenSections;
+              
+              sectionElements.forEach((element, elementIndex) => {
+                const elementDelay = sectionDelay + (elementIndex * QR_ANIMATION_CONFIG.staggerWithinSection);
+                element.style.animationDelay = `${elementDelay}s`;
+              });
+            });
+            
+            console.log(`🎨 Animating QR code in ${QR_ANIMATION_CONFIG.sections} sections with ${allElements.length} total elements`);
+            console.log(`📊 Section breakdown:`, sections.map((s, i) => `Section ${i}: ${s.length} elements`));
+          }
+        }, 100); // Increased delay to ensure SVG is fully rendered
+      }
 
       function openQrModal() {
+        // Clear any existing QR code first
+        if (qrCodeContainer) {
+          qrCodeContainer.innerHTML = '';
+        }
+        
+        // Generate fresh QR code with current URL before opening
+        generateQRCode();
+        
         qrModal.style.display = 'grid';
         requestAnimationFrame(() => {
           qrModal.classList.add('show');
@@ -2165,6 +2376,15 @@ Submitted: ${new Date().toLocaleString()}`
         qrModal.classList.remove('show');
         qrModal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
+        
+        // Clear the QR code instance and container immediately
+        if (qrCodeInstance) {
+          qrCodeInstance = null;
+        }
+        if (qrCodeContainer) {
+          qrCodeContainer.innerHTML = '';
+        }
+        
         setTimeout(() => {
           qrModal.style.display = 'none';
         }, 300);
@@ -2176,6 +2396,106 @@ Submitted: ${new Date().toLocaleString()}`
       qrModal.addEventListener('click', (e) => {
         if (e.target === qrModal) closeQrModal();
       });
+
+      // Regenerate QR code when URL changes (for referral links)
+      window.addEventListener('popstate', generateQRCode);
+      
+      // Regenerate QR code when window is resized (for responsive sizing)
+      window.addEventListener('resize', debounce(() => {
+        if (qrCodeInstance && qrModal.classList.contains('show')) {
+          generateQRCode();
+        }
+      }, 250));
+      
+      // Debounce function for resize events
+      function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+          const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+        };
+      }
+
+      // Debug function to test QR code generation
+      window.testQRCode = function() {
+        console.log('🧪 Testing QR code generation...');
+        console.log('🔍 Current URL:', window.location.href);
+        console.log('🔍 URL params:', new URLSearchParams(window.location.search).toString());
+        generateQRCode();
+        console.log('✅ QR code regenerated');
+      };
+
+      // Debug function to test QR code animation
+      window.testQRAnimation = function(sections = 20, sectionDelay = 0.1) {
+        console.log('🎨 Testing QR code animation...');
+        QR_ANIMATION_CONFIG.sections = sections;
+        QR_ANIMATION_CONFIG.delayBetweenSections = sectionDelay;
+        console.log('🎨 Animation config:', QR_ANIMATION_CONFIG);
+        generateQRCode();
+        console.log('✅ QR code animation updated');
+      };
+
+      // Debug function to change animation style
+      window.setQRAnimationStyle = function(style) {
+        console.log('🎨 Setting QR animation style:', style);
+        switch(style) {
+          case 'fast':
+            QR_ANIMATION_CONFIG.sections = 15;
+            QR_ANIMATION_CONFIG.delayBetweenSections = 0.05;
+            QR_ANIMATION_CONFIG.staggerWithinSection = 0.01;
+            break;
+          case 'slow':
+            QR_ANIMATION_CONFIG.sections = 25;
+            QR_ANIMATION_CONFIG.delayBetweenSections = 0.15;
+            QR_ANIMATION_CONFIG.staggerWithinSection = 0.03;
+            break;
+          case 'smooth':
+            QR_ANIMATION_CONFIG.sections = 20;
+            QR_ANIMATION_CONFIG.delayBetweenSections = 0.08;
+            QR_ANIMATION_CONFIG.staggerWithinSection = 0.015;
+            break;
+          case 'chunky':
+            QR_ANIMATION_CONFIG.sections = 12;
+            QR_ANIMATION_CONFIG.delayBetweenSections = 0.12;
+            QR_ANIMATION_CONFIG.staggerWithinSection = 0.005;
+            break;
+          case 'detailed':
+            QR_ANIMATION_CONFIG.sections = 30;
+            QR_ANIMATION_CONFIG.delayBetweenSections = 0.06;
+            QR_ANIMATION_CONFIG.staggerWithinSection = 0.02;
+            break;
+          default:
+            console.log('Available styles: fast, slow, smooth, chunky, detailed');
+            return;
+        }
+        generateQRCode();
+        console.log('✅ Animation style updated to:', style);
+      };
+
+      // Debug function to see section breakdown
+      window.debugQRSections = function() {
+        const qrSvg = qrCodeContainer.querySelector('svg');
+        if (!qrSvg) {
+          console.log('❌ No QR code found. Generate one first.');
+          return;
+        }
+        
+        const rects = Array.from(qrSvg.querySelectorAll('rect'));
+        const paths = Array.from(qrSvg.querySelectorAll('path'));
+        const circles = Array.from(qrSvg.querySelectorAll('circle'));
+        const polygons = Array.from(qrSvg.querySelectorAll('polygon'));
+        const allElements = [...rects, ...paths, ...circles, ...polygons];
+        
+        console.log(`📊 QR Code Debug Info:`);
+        console.log(`Total elements: ${allElements.length}`);
+        console.log(`Sections: ${QR_ANIMATION_CONFIG.sections}`);
+        console.log(`Section delay: ${QR_ANIMATION_CONFIG.delayBetweenSections}s`);
+        console.log(`Element stagger: ${QR_ANIMATION_CONFIG.staggerWithinSection}s`);
+      };
 
       // Initialize functionality
       window.addEventListener('beforeunload', saveFormData);
@@ -2464,6 +2784,55 @@ Submitted: ${new Date().toLocaleString()}`
         }
         
         return link;
+      };
+
+      // Debug function to test QR code with referral
+      window.testQRWithReferral = function(email) {
+        if (!email) email = 'test@example.com';
+        console.log('🧪 Testing QR code with referral:', email);
+        
+        // Simulate referral URL
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.set('ref', email);
+        window.history.replaceState({}, document.title, newUrl.toString());
+        
+        // Generate QR code
+        generateQRCode();
+        
+        console.log('✅ QR code updated with referral URL:', newUrl.toString());
+        return newUrl.toString();
+      };
+
+      // Debug function to test complete referral + QR system
+      window.testCompleteReferralSystem = function(email) {
+        if (!email) email = 'test@example.com';
+        console.log('🧪 Testing complete referral + QR system with email:', email);
+        
+        // Step 1: Generate affiliate link
+        const affiliateLink = generateAffiliateLink(email);
+        console.log('🔗 Generated affiliate link:', affiliateLink);
+        
+        // Step 2: Simulate visiting the affiliate link
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.set('ref', email);
+        window.history.replaceState({}, document.title, newUrl.toString());
+        
+        // Step 3: Update referral tracking
+        handleReferralTracking();
+        
+        // Step 4: Generate QR code
+        generateQRCode();
+        
+        // Step 5: Verify everything works
+        const currentReferrer = getReferrer();
+        console.log('✅ Current referrer detected:', currentReferrer);
+        console.log('✅ QR code should now contain referral URL');
+        
+        return {
+          affiliateLink: affiliateLink,
+          currentUrl: newUrl.toString(),
+          referrer: currentReferrer
+        };
       };
     })();
   </script>
