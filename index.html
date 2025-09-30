@@ -256,8 +256,14 @@
       background: var(--btn-primary-bg);
       color: var(--text-button); font-weight:800; text-decoration:none; letter-spacing:.3px;
       box-shadow: var(--shadow-button);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
-    .btn:hover{ filter: brightness(1.06); }
+    .btn:hover{ 
+      filter: brightness(1.06); 
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 15px 40px var(--accent-dim);
+    }
     .email{
       display:inline-flex; align-items:center; gap:10px;
       color: var(--text-email);
@@ -265,8 +271,16 @@
       border: 1px solid var(--border-input);
       padding: 10px 14px; border-radius: 12px;
       background: var(--btn-form-hover);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
-    .email:hover{ color: var(--text-primary); border-color: var(--accent-border); background: var(--accent-dim); }
+    .email:hover{ 
+      color: var(--text-primary); 
+      border-color: var(--accent-border); 
+      background: var(--accent-dim); 
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 30px var(--accent-dim);
+    }
 
     footer{ margin-top: clamp(16px, 2.5vw, 24px); font-size: 12px; color: var(--text-footer); opacity:.9; }
 
@@ -733,20 +747,20 @@
     #qrCode svg circle,
     #qrCode svg polygon {
       opacity: 0;
-      transform: scale(0.8);
-      animation: sectionFadeIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-      transform-origin: center;
+      /* Base fade plus optional retro blink injected via CSS var */
+      animation: sectionFadeOpacity 0.5s ease-in-out forwards, var(--qr-blink-animation, none);
+      will-change: opacity;
     }
 
-    @keyframes sectionFadeIn {
-      0% {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
+    @keyframes sectionFadeOpacity {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* Retro-style quick blink for select modules */
+    @keyframes dotBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
 
     /* Mobile responsiveness for QR code */
@@ -771,6 +785,13 @@
         font-size: 13px;
         margin-top: 16px;
       }
+    }
+
+    /* Improve SVG rendering quality and smoothing for QR code */
+    #qrCode svg {
+      shape-rendering: geometricPrecision;
+      image-rendering: optimizeQuality;
+      text-rendering: optimizeLegibility;
     }
 
     /* Affiliate Modal Styles */
@@ -1239,7 +1260,6 @@
             <label class="form-label">Your Affiliate Link:</label>
             <div class="link-display">
               <div id="generatedLink" class="affiliate-link-text"></div>
-              <button type="button" class="btn-copy" id="copyLinkBtn">Copy</button>
             </div>
           </div>
           
@@ -1254,7 +1274,6 @@
           
           <div class="form-actions">
             <button type="button" class="btn-cancel" id="closeAffiliateSuccessBtn">Close</button>
-            <button type="button" class="btn-submit" id="shareLinkBtn">Share Link</button>
           </div>
         </div>
       </div>
@@ -2226,10 +2245,18 @@ Submitted: ${new Date().toLocaleString()}`
       
       // Animation configuration
       const QR_ANIMATION_CONFIG = {
-        sections: 20, // Number of sections to split QR code into
-        delayBetweenSections: 0.1, // Seconds between each section (100ms)
-        animationDuration: 0.6, // Duration of each section's animation (600ms)
-        staggerWithinSection: 0.02 // Small stagger within each section (20ms)
+        sections: 49, // Grid sections used when randomizeOrder is false
+        delayBetweenSections: 0.04,
+        animationDuration: 0.45,
+        staggerWithinSection: 0.008,
+        // New: randomized reveal configuration
+        randomizeOrder: true,
+        maxRandomDelay: 0.6, // seconds - cap for per-element random delay
+        // Retro blink settings
+        blinkEnabled: true,
+        blinkRatio: 0.14, // ~14% of modules blink
+        blinkDurationRange: [0.6, 0.95],
+        blinkRepeat: 2 // number of blinks
       };
 
       // Generate QR code with current URL (including referral if present)
@@ -2265,20 +2292,25 @@ Submitted: ${new Date().toLocaleString()}`
           data: currentUrl,
           margin: 6, // Smaller margin
           type: 'svg',
+          // Increase error correction for cleaner module shapes and better visual merging
+          qrOptions: {
+            errorCorrectionLevel: 'Q'
+          },
           backgroundOptions: { 
             color: 'transparent' // Transparent background
           },
+          // Use simple dots for data modules
           dotsOptions: { 
-            type: 'classy-rounded', // Classy rounded dots
-            color: '#00ff41' // Same green color for all elements
+            type: 'dots',
+            color: '#00ff41'
           },
           cornersSquareOptions: { 
-            type: 'square', // Square corner squares
-            color: '#00ff41' // Same green color
+            type: 'extra-rounded', // Rounded finder patterns for better visual appeal
+            color: '#00ff41'
           },
           cornersDotOptions: { 
-            type: 'square', // Square corner dots
-            color: '#00ff41' // Same green color
+            type: 'dot', // Rounded corner dots
+            color: '#00ff41'
           },
           imageOptions: { 
             crossOrigin: 'anonymous', 
@@ -2314,43 +2346,58 @@ Submitted: ${new Date().toLocaleString()}`
             const svgWidth = svgRect.width;
             const svgHeight = svgRect.height;
             
-            // Create sections based on grid
-            const sectionsPerRow = Math.ceil(Math.sqrt(QR_ANIMATION_CONFIG.sections));
-            const sectionsPerCol = Math.ceil(QR_ANIMATION_CONFIG.sections / sectionsPerRow);
-            const sectionWidth = svgWidth / sectionsPerRow;
-            const sectionHeight = svgHeight / sectionsPerCol;
-            
-            // Group elements by sections
-            const sections = Array.from({ length: QR_ANIMATION_CONFIG.sections }, () => []);
-            
-            allElements.forEach(element => {
-              // Get element position
-              const bbox = element.getBBox();
-              const centerX = bbox.x + bbox.width / 2;
-              const centerY = bbox.y + bbox.height / 2;
-              
-              // Determine which section this element belongs to
-              const sectionX = Math.floor(centerX / sectionWidth);
-              const sectionY = Math.floor(centerY / sectionHeight);
-              const sectionIndex = Math.min(sectionY * sectionsPerRow + sectionX, QR_ANIMATION_CONFIG.sections - 1);
-              
-              sections[sectionIndex].push(element);
-            });
-            
-            // Animate sections with proper timing
-            sections.forEach((sectionElements, sectionIndex) => {
-              if (sectionElements.length === 0) return;
-              
-              const sectionDelay = sectionIndex * QR_ANIMATION_CONFIG.delayBetweenSections;
-              
-              sectionElements.forEach((element, elementIndex) => {
-                const elementDelay = sectionDelay + (elementIndex * QR_ANIMATION_CONFIG.staggerWithinSection);
-                element.style.animationDelay = `${elementDelay}s`;
+            if (QR_ANIMATION_CONFIG.randomizeOrder) {
+              // Randomized per-element delay
+              const maxDelay = Math.max(0.05, QR_ANIMATION_CONFIG.maxRandomDelay || 0.6);
+              allElements.forEach((el) => {
+                const delay = Math.random() * maxDelay;
+                el.style.animationDelay = `${delay.toFixed(3)}s`;
+
+                // Optional retro blink on a subset of modules
+                if (QR_ANIMATION_CONFIG.blinkEnabled && Math.random() < (QR_ANIMATION_CONFIG.blinkRatio || 0)) {
+                  const [minDur, maxDur] = QR_ANIMATION_CONFIG.blinkDurationRange || [0.6, 0.95];
+                  const dur = (minDur + Math.random() * (maxDur - minDur)).toFixed(2);
+                  const extraDelay = (Math.random() * 0.25).toFixed(2); // small extra jitter
+                  const repeat = Math.max(1, QR_ANIMATION_CONFIG.blinkRepeat || 1);
+                  el.style.setProperty('--qr-blink-animation', `dotBlink ${dur}s ease-in-out ${extraDelay}s ${repeat}`);
+                }
               });
-            });
-            
-            console.log(`🎨 Animating QR code in ${QR_ANIMATION_CONFIG.sections} sections with ${allElements.length} total elements`);
-            console.log(`📊 Section breakdown:`, sections.map((s, i) => `Section ${i}: ${s.length} elements`));
+              console.log(`🎲 Animating QR code with randomized delays (max ${maxDelay}s) for ${allElements.length} elements`);
+            } else {
+              // Section-based sequencing (previous behavior)
+              const sectionsPerRow = Math.ceil(Math.sqrt(QR_ANIMATION_CONFIG.sections));
+              const sectionsPerCol = Math.ceil(QR_ANIMATION_CONFIG.sections / sectionsPerRow);
+              const sectionWidth = svgWidth / sectionsPerRow;
+              const sectionHeight = svgHeight / sectionsPerCol;
+              const sections = Array.from({ length: QR_ANIMATION_CONFIG.sections }, () => []);
+              allElements.forEach(element => {
+                const bbox = element.getBBox();
+                const centerX = bbox.x + bbox.width / 2;
+                const centerY = bbox.y + bbox.height / 2;
+                const sectionX = Math.floor(centerX / sectionWidth);
+                const sectionY = Math.floor(centerY / sectionHeight);
+                const sectionIndex = Math.min(sectionY * sectionsPerRow + sectionX, QR_ANIMATION_CONFIG.sections - 1);
+                sections[sectionIndex].push(element);
+              });
+              sections.forEach((sectionElements, sectionIndex) => {
+                if (sectionElements.length === 0) return;
+                const sectionDelay = sectionIndex * QR_ANIMATION_CONFIG.delayBetweenSections;
+                sectionElements.forEach((element, elementIndex) => {
+                  const elementDelay = sectionDelay + (elementIndex * QR_ANIMATION_CONFIG.staggerWithinSection);
+                  element.style.animationDelay = `${elementDelay}s`;
+
+                  // Optional retro blink on a subset of modules
+                  if (QR_ANIMATION_CONFIG.blinkEnabled && Math.random() < (QR_ANIMATION_CONFIG.blinkRatio || 0)) {
+                    const [minDur, maxDur] = QR_ANIMATION_CONFIG.blinkDurationRange || [0.6, 0.95];
+                    const dur = (minDur + Math.random() * (maxDur - minDur)).toFixed(2);
+                    const extraDelay = (Math.random() * 0.25).toFixed(2);
+                    const repeat = Math.max(1, QR_ANIMATION_CONFIG.blinkRepeat || 1);
+                    element.style.setProperty('--qr-blink-animation', `dotBlink ${dur}s ease-in-out ${extraDelay}s ${repeat}`);
+                  }
+                });
+              });
+              console.log(`🎨 Animating QR code in ${QR_ANIMATION_CONFIG.sections} sections with ${allElements.length} total elements`);
+            }
           }
         }, 100); // Increased delay to ensure SVG is fully rendered
       }
@@ -2622,7 +2669,7 @@ Submitted: ${new Date().toLocaleString()}`
       
       // Display affiliate link with proper formatting
       function displayAffiliateLink(email, link) {
-        // Create a user-friendly display version
+        // Create a user-friendly display version (no encoding for display)
         const displayText = `${window.location.origin}?ref=${email}`;
         console.log('🔗 Display text:', displayText);
         return displayText;
@@ -2631,7 +2678,9 @@ Submitted: ${new Date().toLocaleString()}`
       // Copy link to clipboard
       async function copyToClipboard(text) {
         try {
-          await navigator.clipboard.writeText(text);
+          // Use the properly encoded link for copying (stored in dataset)
+          const actualLink = generatedLink.dataset.actualLink || text;
+          await navigator.clipboard.writeText(actualLink);
           
           // Show success feedback
           const originalText = copyLinkBtn.textContent;
@@ -2646,8 +2695,9 @@ Submitted: ${new Date().toLocaleString()}`
           console.error('Failed to copy: ', err);
           
           // Fallback for older browsers
+          const actualLink = generatedLink.dataset.actualLink || text;
           const textArea = document.createElement('textarea');
-          textArea.value = text;
+          textArea.value = actualLink;
           document.body.appendChild(textArea);
           textArea.select();
           document.execCommand('copy');
