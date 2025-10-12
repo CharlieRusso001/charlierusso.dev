@@ -158,12 +158,12 @@
       transform: translateY(20px) scale(0.95);
     }
     
-    .card .hero-text {
+    .card-content .hero-text {
       opacity: 0;
       transform: translateY(20px) scale(0.95);
     }
     
-    .card.show .hero-text {
+    .card.show .card-content .hero-text {
       opacity: 1;
       transform: translateY(0) scale(1);
       transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -188,11 +188,49 @@
 
     /* CTA Card */
     .wrap{
-      position:relative; z-index: 2; height: 100dvh;
-      display:grid; place-items:center; padding: clamp(12px, 3vw, 28px);
+      position:relative; z-index: 2; 
+      height: 100dvh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+    
+    /* Custom Scrollbar for wrap */
+    .wrap::-webkit-scrollbar {
+      width: 10px;
+    }
+    
+    .wrap::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+    }
+    
+    .wrap::-webkit-scrollbar-thumb {
+      background: var(--accent-border);
+      border-radius: 5px;
+    }
+    
+    .wrap::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-secondary);
     }
 
     .card{
+      min-height: 100dvh;
+      padding: clamp(12px, 3vw, 28px);
+      padding-top: clamp(50px, 12vh, 200px);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: padding-top 2.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .card::before {
+      content: '';
+      flex: 1;
+      min-height: 0;
+    }
+    
+    .card-content {
       width:min(960px, 100%);
       background: var(--bg-card);
       border: 1px solid var(--border-primary);
@@ -203,44 +241,53 @@
       text-align:center;
       opacity: 0;
       transform: translateY(30px);
-      transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+      transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1), 
+                  transform 2.5s cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
     }
-    .card.show{ 
+    
+    .card::after {
+      content: '';
+      flex: 1;
+      min-height: 0;
+    }
+    
+    .card.show .card-content{ 
       opacity: 1;
       transform: translateY(0);
     }
     
     
-    .tagline {
+    .card-content .tagline {
       opacity: 0;
       transform: translateY(15px);
       transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.4s;
     }
     
-    .card.show .tagline {
+    .card.show .card-content .tagline {
       opacity: 1;
       transform: translateY(0);
     }
     
-    .actions > * {
+    .card-content .actions > * {
       opacity: 0;
       transform: translateY(10px);
       transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
     }
     
-    .actions > *:nth-child(1) {
+    .card-content .actions > *:nth-child(1) {
       transition-delay: 0.6s;
     }
     
-    .actions > *:nth-child(2) {
+    .card-content .actions > *:nth-child(2) {
       transition-delay: 0.8s;
     }
     
-    .actions > *:nth-child(3) {
+    .card-content .actions > *:nth-child(3) {
       transition-delay: 1.0s;
     }
     
-    .card.show .actions > * {
+    .card.show .card-content .actions > * {
       opacity: 1;
       transform: translateY(0);
     }
@@ -284,6 +331,279 @@
 
     footer{ margin-top: clamp(16px, 2.5vw, 24px); font-size: 12px; color: var(--text-footer); opacity:.9; }
 
+    /* Read More Button */
+    .btn-read-more {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 24px;
+      padding: 12px 24px;
+      background: rgba(0,255,65,0.05);
+      border: 1px solid var(--border-primary);
+      border-radius: 12px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    
+    .card.show .card-content .btn-read-more {
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1) 1.2s;
+    }
+    
+    .btn-read-more:hover {
+      background: var(--accent-dim);
+      border-color: var(--accent-border);
+      color: var(--text-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px var(--accent-dim);
+    }
+    
+    .btn-read-more .arrow-icon {
+      transition: transform 0.3s ease;
+    }
+    
+    .btn-read-more.expanded .arrow-icon {
+      transform: rotate(180deg);
+    }
+    
+    /* About Section */
+    .about-section {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 5.0s cubic-bezier(0.16, 1, 0.3, 1), 
+                  margin-top 5.0s cubic-bezier(0.16, 1, 0.3, 1);
+      margin-top: 0;
+    }
+    
+    .about-section.expanded {
+      max-height: 2400px;
+      margin-top: 32px;
+    }
+    
+    .about-divider {
+      width: 560px;
+      max-width: 90%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+      margin: 0 auto 24px;
+      opacity: 0;
+      transform: scaleX(0);
+      transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+    
+    .about-section.expanded .about-divider {
+      opacity: 1;
+      transform: scaleX(1);
+      transition-delay: 0.1s;
+    }
+    
+    .about-divider-bottom {
+      margin: 32px auto 24px;
+      transition-delay: 1.5s;
+    }
+    
+    .about-title {
+      font-size: clamp(24px, 4vw, 36px);
+      color: var(--text-hero);
+      margin: 0 0 24px 0;
+      text-align: center;
+      font-weight: 800;
+      text-shadow: 0 0 20px var(--accent-glow);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 1.0s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .about-section.expanded .about-title {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 0.3s;
+    }
+    
+    .about-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(16px, 2.5vw, 24px);
+      align-items: center;
+    }
+    
+    .about-image-section {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: all 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+    
+    .about-section.expanded .about-image-section {
+      opacity: 1;
+      transform: translateX(0);
+      transition-delay: 0.6s;
+    }
+    
+    .about-image {
+      width: 100%;
+    }
+    
+        .about-image img {
+          width: 68%;
+          height: auto;
+          border-radius: 16px;
+          border: 2px solid var(--border-primary);
+          box-shadow: 0 10px 40px var(--accent-dim);
+          transition: all 0.1s ease;
+          margin: 0 auto;
+          display: block;
+          transform-style: preserve-3d;
+          perspective: 1000px;
+        }
+        
+        .about-image img:hover {
+          border-color: var(--accent-border);
+          box-shadow: 0 15px 50px var(--accent-shadow);
+        }
+    
+    .linkedin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(0,255,65,0.05);
+      border: 2px solid var(--border-primary);
+      border-radius: 12px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    
+    .linkedin-btn:hover {
+      background: var(--accent-dim);
+      border-color: var(--accent-border);
+      color: var(--text-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px var(--accent-dim);
+    }
+    
+    .linkedin-icon {
+      color: var(--accent-primary);
+      flex-shrink: 0;
+    }
+    
+    .about-text {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: all 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .about-section.expanded .about-text {
+      opacity: 1;
+      transform: translateX(0);
+      transition-delay: 0.9s;
+    }
+    
+    .about-text p {
+      color: var(--text-secondary);
+      font-size: clamp(13px, 2.2vw, 15px);
+      line-height: 1.7;
+      margin: 0 0 16px 0;
+    }
+    
+    .about-text p:last-child {
+      margin-bottom: 0;
+    }
+    
+    /* About Stats Section */
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: clamp(16px, 3vw, 24px);
+      margin-top: 32px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 1.0s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .about-section.expanded .about-stats {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 1.2s;
+    }
+    
+    .stat-card {
+      background: rgba(0,255,65,0.05);
+      border: 2px solid var(--border-primary);
+      border-radius: 16px;
+      padding: clamp(20px, 3vw, 32px);
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent, rgba(0,255,65,0.1));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      border-color: var(--accent-border);
+      background: rgba(0,255,65,0.1);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 40px var(--accent-dim);
+    }
+    
+    .stat-card:hover::before {
+      opacity: 1;
+    }
+    
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: clamp(12px, 1.8vw, 14px);
+      font-weight: 600;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    
+    .stat-number {
+      color: var(--text-hero);
+      font-size: clamp(48px, 8vw, 80px);
+      font-weight: 900;
+      font-style: italic;
+      line-height: 1;
+      margin: 8px 0;
+      text-shadow: 0 0 20px var(--accent-glow);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .stat-description {
+      color: var(--text-secondary);
+      font-size: clamp(13px, 2vw, 16px);
+      line-height: 1.4;
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
     /* Mobile and tablet text size increases */
     @media (max-width: 768px) and (min-width: 481px){
       .hero-text { font-size: clamp(30px, 6.5vw, 76px); }
@@ -311,6 +631,56 @@
       .tagline-line2 {
         display: block;
         white-space: nowrap;
+      }
+      
+      /* Mobile About Section */
+      .btn-read-more {
+        width: 100%;
+        justify-content: center;
+        font-size: 16px;
+      }
+      
+      .about-content {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      
+      .about-image-section {
+        order: 2;
+      }
+      
+      .about-text {
+        order: 1;
+      }
+      
+      .about-section.expanded {
+        max-height: 2500px;
+      }
+      
+      /* Mobile Stats Section */
+      .about-stats {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+    
+    /* Tablet About Section */
+    @media (max-width: 768px) {
+      .about-content {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+      
+      .about-image-section {
+        order: 2;
+      }
+      
+      .about-text {
+        order: 1;
+      }
+      
+      .about-section.expanded {
+        max-height: 2200px;
       }
     }
 
@@ -456,6 +826,274 @@
     .form-input::placeholder, .form-textarea::placeholder{
       color: rgba(132,255,176,0.5);
       font-style: italic;
+    }
+    
+    /* Phone Number with Country Code Selector */
+    .phone-input-container {
+      display: flex;
+      gap: 8px;
+      position: relative;
+    }
+    
+    .country-selector {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-form);
+      color: var(--text-muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: inset 0 0 10px var(--accent-dim);
+      min-width: 110px;
+      white-space: nowrap;
+    }
+    
+    .country-selector:hover {
+      border-color: var(--border-input-focus);
+      background: var(--bg-form);
+    }
+    
+    .country-flag {
+      width: 20px;
+      height: 15px;
+      object-fit: cover;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    
+    .country-code {
+      color: var(--text-primary);
+      font-weight: 600;
+      flex: 1;
+    }
+    
+    .dropdown-arrow {
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: transform 0.3s;
+    }
+    
+    .country-selector.open .dropdown-arrow {
+      transform: rotate(180deg);
+    }
+    
+    .phone-input {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .country-dropdown {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 400px;
+      max-height: 80vh;
+      background: var(--bg-form);
+      border: 2px solid var(--border-form);
+      border-radius: 12px;
+      box-shadow: 
+        0 30px 100px rgba(0,255,65,0.3),
+        0 20px 60px rgba(0,0,0,0.9);
+      z-index: 10000;
+      overflow: hidden;
+      animation: dropdownFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .country-dropdown-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      animation: backdropFadeIn 0.3s ease-out;
+    }
+    
+    @keyframes backdropFadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    @keyframes dropdownFadeIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+    
+    .country-dropdown-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--border-form);
+    }
+    
+    .country-dropdown-title {
+      color: var(--text-hero);
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      text-shadow: var(--shadow-glow);
+      letter-spacing: 0.5px;
+    }
+    
+    .country-dropdown-close {
+      background: var(--bg-input);
+      border: 1px solid var(--border-form);
+      color: var(--text-hero);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 2px 8px;
+      line-height: 1;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      transition: all 0.2s;
+      border-radius: 4px;
+    }
+    
+    .country-dropdown-close:hover {
+      background: var(--btn-form-hover);
+      box-shadow: var(--shadow-glow);
+      transform: scale(1.1);
+    }
+    
+    .country-search {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--bg-input);
+      border: none;
+      border-bottom: 1px solid var(--border-form);
+      color: var(--text-primary);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      outline: none;
+    }
+    
+    .country-search::placeholder {
+      color: rgba(132,255,176,0.5);
+    }
+    
+    .country-search:focus {
+      background: var(--bg-form);
+      box-shadow: inset 0 0 10px var(--accent-dim);
+    }
+    
+    .country-list {
+      max-height: calc(80vh - 160px);
+      overflow-y: auto;
+      padding: 4px;
+    }
+    
+    .country-list::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .country-list::-webkit-scrollbar-track {
+      background: var(--bg-input);
+    }
+    
+    .country-list::-webkit-scrollbar-thumb {
+      background: var(--accent-border);
+      border-radius: 4px;
+    }
+    
+    .country-list::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-secondary);
+    }
+    
+    .country-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+    }
+    
+    .country-item:hover {
+      background: var(--accent-dim);
+      color: var(--text-primary);
+    }
+    
+    .country-item-flag {
+      width: 24px;
+      height: 18px;
+      object-fit: cover;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    
+    .country-item-name {
+      flex: 1;
+      color: var(--text-muted);
+    }
+    
+    .country-item-code {
+      color: var(--text-hero);
+      font-weight: 600;
+      margin-left: auto;
+    }
+    
+    .country-item.selected {
+      background: var(--accent-dim);
+      color: var(--text-primary);
+    }
+    
+    /* Mobile adjustments for country selector */
+    @media (max-width: 768px) {
+      .phone-input-container {
+        flex-direction: row;
+        gap: 6px;
+      }
+      
+      .country-selector {
+        min-width: 100px;
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+      
+      .country-flag {
+        width: 18px;
+        height: 13px;
+      }
+      
+      .country-dropdown {
+        max-width: 100%;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .country-selector {
+        min-width: 90px;
+        padding: 6px 8px;
+        font-size: 11px;
+      }
+      
+      .country-flag {
+        width: 16px;
+        height: 12px;
+      }
+      
+      .country-code {
+        font-size: 11px;
+      }
     }
     
     .form-actions{
@@ -618,6 +1256,378 @@
       max-width: 400px;
     }
     
+
+    /* Pricing Section */
+    .pricing-content {
+      margin-top: 32px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 1.0s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .about-section.expanded .pricing-content {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 1.6s;
+    }
+    
+    .pricing-title {
+      font-size: clamp(24px, 4vw, 36px);
+      color: var(--text-hero);
+      margin: 0 0 32px 0;
+      text-align: center;
+      font-weight: 800;
+      text-shadow: 0 0 20px var(--accent-glow);
+    }
+    
+    .pricing-calculator {
+      background: rgba(0,255,65,0.03);
+      border: 2px solid var(--border-primary);
+      border-radius: 16px;
+      padding: clamp(24px, 4vw, 40px);
+      transition: all 0.3s ease;
+    }
+    
+    .pricing-calculator:hover {
+      border-color: var(--accent-border);
+      box-shadow: 0 10px 40px var(--accent-dim);
+    }
+    
+    .calculator-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .calculator-header h3 {
+      font-size: clamp(18px, 3vw, 24px);
+      color: var(--text-primary);
+      margin: 0 0 8px 0;
+      font-weight: 700;
+    }
+    
+    .calculator-header p {
+      font-size: clamp(12px, 2vw, 14px);
+      color: var(--text-secondary);
+      margin: 0;
+      opacity: 0.8;
+    }
+    
+    .calculator-form {
+      display: grid;
+      gap: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .calc-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .calc-row label {
+      color: var(--text-primary);
+      font-size: clamp(12px, 2vw, 14px);
+      font-weight: 600;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    
+    .calc-select {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-form);
+      border-radius: 0;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: inset 0 0 10px var(--accent-dim);
+    }
+    
+    .calc-select:focus {
+      outline: none;
+      border-color: var(--border-input-focus);
+      background: var(--bg-form);
+      box-shadow: 
+        inset 0 0 10px var(--accent-border),
+        var(--shadow-glow);
+    }
+    
+    .calc-select option {
+      background: #000;
+      color: #84ffb0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    
+    .calc-result {
+      margin-top: 24px;
+      padding: 24px;
+      background: rgba(0,255,65,0.08);
+      border: 2px solid var(--accent-border);
+      border-radius: 12px;
+      text-align: center;
+    }
+    
+    .result-label {
+      color: var(--text-secondary);
+      font-size: clamp(12px, 2vw, 14px);
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    
+    .result-price {
+      color: var(--text-hero);
+      font-size: clamp(36px, 8vw, 56px);
+      font-weight: 900;
+      font-style: italic;
+      line-height: 1;
+      text-shadow: 0 0 20px var(--accent-glow);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      margin-bottom: 12px;
+    }
+    
+    .result-note {
+      color: var(--text-secondary);
+      font-size: clamp(10px, 1.5vw, 12px);
+      opacity: 0.7;
+      font-style: italic;
+    }
+    
+    .payment-info {
+      margin-top: 40px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border-primary);
+    }
+    
+    .payment-info h4 {
+      color: var(--text-primary);
+      font-size: clamp(16px, 2.5vw, 20px);
+      margin: 0 0 12px 0;
+      font-weight: 700;
+      text-align: center;
+    }
+    
+    .payment-info > p {
+      color: var(--text-secondary);
+      font-size: clamp(12px, 2vw, 14px);
+      text-align: center;
+      margin: 0 0 24px 0;
+    }
+    
+    .payment-methods {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .payment-method {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: rgba(0,255,65,0.05);
+      border: 2px solid var(--border-primary);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    
+    .payment-method:hover {
+      border-color: var(--accent-border);
+      background: rgba(0,255,65,0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px var(--accent-dim);
+    }
+    
+    .payment-icon {
+      color: var(--accent-primary);
+      flex-shrink: 0;
+    }
+    
+    .payment-method span {
+      color: var(--text-secondary);
+      font-size: clamp(12px, 2vw, 14px);
+      font-weight: 600;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    
+    @media (max-width: 768px) {
+      .pricing-content {
+        margin-top: 24px;
+      }
+      
+      .payment-methods {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Footer Widget */
+    .footer-widget {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      flex-wrap: wrap;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .card.show .footer-widget {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 1.4s;
+    }
+    
+    .footer-copyright {
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      opacity: 0.9;
+    }
+    
+    .footer-link-btn {
+      background: rgba(0,255,65,0.05);
+      border: 1px solid var(--border-primary);
+      color: var(--text-secondary);
+      font-size: 10px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    
+    .footer-link-btn:hover {
+      background: var(--accent-dim);
+      border-color: var(--accent-border);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px var(--accent-dim);
+    }
+    
+    /* Mobile adjustments for footer widget */
+    @media (max-width: 768px) {
+      .footer-widget {
+        margin-top: 20px;
+        padding-top: 16px;
+        gap: 12px;
+      }
+      
+      .footer-copyright {
+        font-size: 10px;
+        width: 100%;
+        text-align: center;
+      }
+      
+      .footer-link-btn {
+        font-size: 9px;
+        padding: 5px 10px;
+      }
+    }
+    
+    /* Policy Modal Styles */
+    .policy-modal {
+      position: fixed; inset: 0; z-index: 20;
+      display: grid; place-items: center; padding: 20px;
+      background: rgba(0,0,0,0);
+      backdrop-filter: blur(0px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1), 
+                  background-color 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  backdrop-filter 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  visibility 0s linear 0.5s;
+    }
+    
+    .policy-modal.show {
+      opacity: 1;
+      visibility: visible;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1), 
+                  background-color 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  backdrop-filter 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .policy-modal .form-container {
+      transform: scale(0.8) translateY(30px);
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .policy-modal.show .form-container {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+    
+    .policy-content {
+      color: var(--text-secondary);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    
+    .policy-content h3 {
+      color: var(--text-hero);
+      font-size: 16px;
+      margin: 0 0 20px 0;
+      font-weight: 700;
+      text-shadow: var(--shadow-glow);
+    }
+    
+    .policy-content h4 {
+      color: var(--text-primary);
+      font-size: 14px;
+      margin: 16px 0 8px 0;
+      font-weight: 700;
+    }
+    
+    .policy-content h4:before {
+      content: "> ";
+      color: var(--accent-primary);
+    }
+    
+    .policy-content p {
+      margin: 0 0 12px 0;
+      color: var(--text-secondary);
+    }
+    
+    .policy-content ul {
+      list-style-type: disc;
+      color: var(--text-secondary);
+      margin: 8px 0 12px 20px;
+      padding: 0;
+    }
+    
+    .policy-content li {
+      margin: 4px 0;
+      color: var(--text-secondary);
+    }
+    
+    .policy-content a {
+      color: var(--text-hero);
+      text-decoration: underline;
+    }
+    
+    .policy-content a:hover {
+      color: var(--accent-primary);
+    }
 
     /* QR Code Button */
     .qr-button {
@@ -792,6 +1802,95 @@
       shape-rendering: geometricPrecision;
       image-rendering: optimizeQuality;
       text-rendering: optimizeLegibility;
+    }
+
+    /* Ready to Work Popup */
+    .ready-popup {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .ready-popup.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .ready-popup-container {
+      width: min(400px, 90vw);
+      background: var(--bg-form);
+      border: 2px solid var(--border-form);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 
+        0 30px 100px rgba(0,255,65,0.3),
+        0 10px 40px rgba(0,0,0,0.8);
+      position: relative;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      transform: scale(0.9) translateY(20px);
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .ready-popup.show .ready-popup-container {
+      transform: scale(1) translateY(0);
+    }
+    
+    .ready-popup-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-form);
+      color: var(--text-hero);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 2px 8px;
+      line-height: 1;
+      transition: all 0.2s;
+      border-radius: 4px;
+    }
+    
+    .ready-popup-close:hover {
+      background: var(--btn-form-hover);
+      box-shadow: var(--shadow-glow);
+      transform: scale(1.1);
+    }
+    
+    .ready-popup-title {
+      color: var(--text-hero);
+      font-size: clamp(18px, 3vw, 22px);
+      font-weight: 800;
+      margin: 0 0 12px 0;
+      text-shadow: var(--shadow-glow);
+      text-align: center;
+    }
+    
+    .ready-popup-text {
+      color: var(--text-secondary);
+      font-size: clamp(13px, 2vw, 15px);
+      line-height: 1.6;
+      margin: 0 0 20px 0;
+      text-align: center;
+    }
+    
+    .ready-popup-btn {
+      width: 100%;
+      margin: 0;
+    }
+    
+    /* Mobile adjustments for popup */
+    @media (max-width: 768px) {
+      .ready-popup-container {
+        width: 95%;
+        padding: 20px;
+      }
     }
 
     /* Affiliate Modal Styles */
@@ -1082,30 +2181,287 @@
   <!-- CTA -->
   <main class="wrap">
     <section id="card" class="card" role="region" aria-label="Technical help call to action">
-      <div class="hero-text">
-        <span class="typing-text">
-          <span class="line1"></span>
-          <span class="line2"></span>
-          <span class="line3"></span>
-        </span>
-      </div>
-      <p class="tagline">
-        <span class="tagline-line1">Affordable development freelancing services for</span>
-        <span class="tagline-line2">fullstack development, prototype manufacturing, etc.</span>
-      </p>
-      <div class="actions">
-        <button class="btn" id="openFormBtn" type="button">Fill out Your Inquiry Here</button>
-        <button class="btn btn-affiliate" id="openAffiliateBtn" type="button">Become an Affiliate</button>
-        <a class="email" href="mailto:russoc2023@fau.edu" aria-label="Email russoc2023 at fau dot edu">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="1.6"/>
-            <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.6"/>
+      <div class="card-content">
+        <div class="hero-text">
+          <span class="typing-text">
+            <span class="line1"></span>
+            <span class="line2"></span>
+            <span class="line3"></span>
+          </span>
+        </div>
+        <p class="tagline">
+          <span class="tagline-line1">Affordable development freelancing services for</span>
+          <span class="tagline-line2">fullstack development, prototype manufacturing, etc.</span>
+        </p>
+        <div class="actions">
+          <button class="btn" id="openFormBtn" type="button">Fill out Your Inquiry Here</button>
+          <button class="btn btn-affiliate" id="openAffiliateBtn" type="button">Become an Affiliate</button>
+          <a class="email" href="mailto:russoc2023@fau.edu" aria-label="Email russoc2023 at fau dot edu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="1.6"/>
+              <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+            russoc2023@fau.edu
+          </a>
+        </div>
+        
+        <!-- Read More Button -->
+        <button class="btn-read-more" id="readMoreBtn" type="button">
+          <svg class="arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          russoc2023@fau.edu
-        </a>
+          Read More About Us
+        </button>
+        
+        <!-- Expandable About Section -->
+        <div class="about-section" id="aboutSection">
+          <div class="about-divider"></div>
+          <h2 class="about-title">About</h2>
+          <div class="about-content">
+            <div class="about-image-section">
+              <div class="about-image">
+                <img src="media/charlie.jpg" alt="Charles Russo" />
+              </div>
+              <a href="https://www.linkedin.com/in/charles-russo-b5bb20338/" target="_blank" rel="noopener noreferrer" class="linkedin-btn">
+                <svg class="linkedin-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+                Connect on LinkedIn
+              </a>
+            </div>
+            <div class="about-text">
+              <p>This is a technical consulting service led by Charles Russo, a prospective University of Chicago student with nearly a decade of experience in engineering and technology. Charles has worked on a wide range of engineering projects, combining innovation with practical expertise.</p>
+              <p>We specialize in full-stack software development, hardware development, and a variety of other technical solutions designed to bring your ideas to life. Whether you're building a product from the ground up or need expert guidance on complex systems, we're here to help.</p>
+            </div>
+          </div>
+          
+          <!-- Stats Section -->
+          <div class="about-stats">
+            <div class="stat-card">
+              <div class="stat-label">Up to</div>
+              <div class="stat-number">95%</div>
+              <div class="stat-description">Saving on Website Costs</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">We have</div>
+              <div class="stat-number">ZERO</div>
+              <div class="stat-description">Recurring or Hidden Fees</div>
+            </div>
+          </div>
+          
+          <!-- Bottom Divider -->
+          <div class="about-divider about-divider-bottom"></div>
+          
+          <!-- Pricing Section -->
+          <div class="pricing-content">
+            <h2 class="pricing-title">Pricing and Payment</h2>
+            
+            <div class="pricing-calculator">
+              <div class="calculator-header">
+                <h3>Project Cost Estimator</h3>
+                <p>Select your project requirements to get an estimated cost</p>
+              </div>
+              
+              <div class="calculator-form">
+                <div class="calc-row">
+                  <label for="calcProjectType">Project Type</label>
+                  <select id="calcProjectType" class="calc-select">
+                    <option value="">Select project type...</option>
+                    <option value="250">Website Design (Basic)</option>
+                    <option value="750">Website Design (Advanced)</option>
+                    <option value="2000">Full-Stack Web Application</option>
+                    <option value="3000">Mobile App Development</option>
+                    <option value="1000">Hardware Prototyping</option>
+                    <option value="700">Simple CAD Design</option>
+                    <option value="100">Hourly Technical Consulting</option>
+                    <option value="500">Code Review & Optimization</option>
+                  </select>
+                </div>
+                
+                <div class="calc-row">
+                  <label for="calcComplexity">Project Complexity</label>
+                  <select id="calcComplexity" class="calc-select">
+                    <option value="">Select complexity...</option>
+                    <option value="1">Simple</option>
+                    <option value="1.7">Moderate</option>
+                    <option value="2">Complex</option>
+                    <option value="4">Enterprise-Level</option>
+                  </select>
+                </div>
+                
+                <div class="calc-row">
+                  <label for="calcTimeline">Timeline</label>
+                  <select id="calcTimeline" class="calc-select">
+                    <option value="">Select timeline...</option>
+                    <option value="0.9">Flexible (2+ weeks)</option>
+                    <option value="1">Standard (1-2 weeks)</option>
+                    <option value="1.3">Rush (1 week)</option>
+                    <option value="2">Urgent (72 Hours)</option>
+                  </select>
+                </div>
+                
+                <div class="calc-row">
+                  <label for="calcSupport">Post-Launch Support</label>
+                  <select id="calcSupport" class="calc-select">
+                    <option value="">Select support...</option>
+                    <option value="1">None</option>
+                    <option value="1.2">1 Month</option>
+                    <option value="1.3">3 Months</option>
+                    <option value="1.5">6 Months</option>
+                    <option value="3">12 Months</option>
+                  </select>
+                </div>
+                
+                <div class="calc-result">
+                  <div class="result-label">Estimated Cost:</div>
+                  <div class="result-price" id="calcResult">$0</div>
+                  <div class="result-note">*This is an estimate. Final pricing will be discussed and agreed upon before work begins.  Short time frames are not applicable to all projects.</div>
+                </div>
+              </div>
+              
+              <div class="payment-info">
+                <h4>Payment Methods</h4>
+                <p>We accept the following payment methods:</p>
+                <div class="payment-methods">
+                  <div class="payment-method">
+                    <svg class="payment-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                      <line x1="1" y1="10" x2="23" y2="10"></line>
+                    </svg>
+                    <span>Credit/Debit Cards via PayPal</span>
+                  </div>
+                  <div class="payment-method">
+                    <svg class="payment-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="12" y1="1" x2="12" y2="23"></line>
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    <span>Cash</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Footer Widget -->
+      <div class="footer-widget">
+        <span class="footer-copyright">© Charles Russo</span>
+        <button class="footer-link-btn" id="privacyBtn" type="button">Privacy Policy</button>
+        <button class="footer-link-btn" id="termsBtn" type="button">Terms of Service</button>
       </div>
     </section>
   </main>
+
+  <!-- Privacy Policy Modal -->
+  <div id="privacyModal" class="policy-modal" aria-hidden="true">
+    <div class="form-container" role="dialog" aria-labelledby="privacyTitle">
+      <div class="form-header">
+        <h2 id="privacyTitle" class="form-title">Privacy Policy</h2>
+        <button class="close-btn" id="closePrivacyBtn" type="button" aria-label="Close privacy policy">&times;</button>
+      </div>
+      <div class="policy-content">
+        <p style="margin-bottom: 20px; opacity: 0.8;">Effective Date: October 2025</p>
+        
+        <h4>1. Introduction</h4>
+        <p>Charles Russo ("we," "us," "our") provides freelance technical consulting, software development, hardware development, and creative services. This Privacy Policy explains how we collect, use, and protect your personal information.</p>
+        
+        <h4>2. Information We Collect</h4>
+        <p>We may collect the following information when you contact or work with us:</p>
+        <ul style="margin-left: 20px; margin-bottom: 12px;">
+          <li>Name, email address, and phone number</li>
+          <li>Company name, website, and project details</li>
+          <li>Billing information (if applicable)</li>
+        </ul>
+        
+        <h4>3. How We Use Your Information</h4>
+        <p>We use your information to:</p>
+        <ul style="margin-left: 20px; margin-bottom: 12px;">
+          <li>Communicate with you about your project</li>
+          <li>Provide and improve our services</li>
+          <li>Send invoices and payment reminders</li>
+          <li>With your consent, send marketing messages or updates about our work</li>
+        </ul>
+        <p>We will not sell or share your personal data with third parties for unrelated marketing purposes.</p>
+        
+        <h4>4. Marketing Communications</h4>
+        <p>We only send marketing or promotional messages if you explicitly consent (for example, by checking a box or signing up). You can withdraw your consent anytime by replying "unsubscribe" or emailing us at <a href="mailto:russoc2023@fau.edu">russoc2023@fau.edu</a>.</p>
+        
+        <h4>5. Portfolio & Logo Use</h4>
+        <p>We may display your logo, website screenshots, or testimonials on our website or social media to showcase completed work. We will never modify your logo or display confidential information without your approval.</p>
+        
+        <h4>6. Data Retention</h4>
+        <p>We retain client contact information only as long as necessary to provide services or comply with legal obligations. You can request deletion at any time.</p>
+        
+        <h4>7. Security</h4>
+        <p>We take reasonable steps to protect your data using secure storage and encrypted communications.</p>
+        
+        <h4>8. Your Rights (for EU/California clients)</h4>
+        <p>You may request access, correction, deletion, or restriction of your data. If you are an EU or California resident, you also have the right to complain to your local data authority.</p>
+        
+        <h4>9. Contact</h4>
+        <p>For any privacy concerns, email <a href="mailto:russoc2023@fau.edu">russoc2023@fau.edu</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terms of Service Modal -->
+  <div id="termsModal" class="policy-modal" aria-hidden="true">
+    <div class="form-container" role="dialog" aria-labelledby="termsTitle">
+      <div class="form-header">
+        <h2 id="termsTitle" class="form-title">Terms of Service</h2>
+        <button class="close-btn" id="closeTermsBtn" type="button" aria-label="Close terms of service">&times;</button>
+      </div>
+      <div class="policy-content">
+        <p style="margin-bottom: 20px; opacity: 0.8;">Effective Date: October 2025</p>
+        
+        <h4>1. Services</h4>
+        <p>Charles Russo ("Freelancer") provides freelance technical consulting, software development, hardware development, and creative services according to the agreed project scope.</p>
+        
+        <h4>2. Client Responsibilities</h4>
+        <p>Clients must provide accurate information, materials, and approvals in a timely manner.</p>
+        
+        <h4>3. Intellectual Property</h4>
+        <ul style="margin-left: 20px; margin-bottom: 12px;">
+          <li>The client retains ownership of their logo, content, and branding materials.</li>
+          <li>Freelancer may not use client materials for other purposes without consent.</li>
+        </ul>
+        
+        <h4>4. Restrictions</h4>
+        <p>Freelancer will not create, promote, or assist in the development of materials related to weapons, violence, terrorism, hate speech, or illegal activities.</p>
+        
+        <h4>5. Payment</h4>
+        <p>Invoices are due as stated in the project agreement. Work may pause if payment is delayed.</p>
+        
+        <h4>6. Limitation of Liability</h4>
+        <p>Freelancer provides services using reasonable skill and care but makes no guarantee of error-free or uninterrupted results. To the fullest extent permitted by law:</p>
+        <ul style="margin-left: 20px; margin-bottom: 12px;">
+          <li>Freelancer's total liability for any claim is limited to the total amount paid by the client for that specific project.</li>
+          <li>Freelancer is not liable for indirect, incidental, or consequential damages.</li>
+        </ul>
+        
+        <h4>7. Warranties & Disclaimers</h4>
+        <p>Freelancer will correct material defects reported within 150 days of project delivery but cannot guarantee compatibility with all devices, browsers, or third-party systems.</p>
+        
+        <h4>8. Termination</h4>
+        <p>Either party may terminate the agreement with written notice if the other breaches material terms. Outstanding payments remain due.</p>
+        
+        <h4>9. Governing Law & Dispute Resolution</h4>
+        <p>This agreement is governed by the laws of the State of Florida, United States.</p>
+        <p><strong>Arbitration:</strong> Any disputes, claims, or controversies arising from or relating to this agreement shall be resolved through binding arbitration rather than in court. Arbitration will be conducted by a single arbitrator in accordance with the rules of the American Arbitration Association (AAA). The arbitration will take place in Florida, and the arbitrator's decision will be final and binding on both parties.</p>
+        <p>Both parties waive the right to a jury trial and the right to participate in a class action. The prevailing party in any arbitration shall be entitled to recover reasonable attorney's fees and costs.</p>
+        
+        <h4>10. Affiliate Program</h4>
+        <p>Affiliates receive commission for successful referrals as agreed upon. For affiliate inquiries, email <a href="mailto:russoc2023@fau.edu">russoc2023@fau.edu</a>.</p>
+        
+        <h4>11. Acceptance</h4>
+        <p>By hiring Charles Russo or using the services, the client agrees to these Terms of Service and the accompanying Privacy Policy.</p>
+        
+        <h4>Contact</h4>
+        <p>For questions, email <a href="mailto:russoc2023@fau.edu">russoc2023@fau.edu</a></p>
+      </div>
+    </div>
+  </div>
 
   <!-- Form Modal -->
   <div id="formModal" aria-hidden="true">
@@ -1127,18 +2483,41 @@
         </div>
         
         <div class="form-group">
-          <label class="form-label" for="phone">Phone Number</label>
-          <input type="tel" id="phone" name="phone" class="form-input">
+          <label class="form-label" for="phone">Phone Number *</label>
+          <div class="phone-input-container">
+            <button type="button" class="country-selector" id="countrySelector" aria-label="Select country code">
+              <img src="media/flags/us.svg" alt="US Flag" class="country-flag" id="selectedFlag">
+              <span class="country-code" id="selectedCode">+1</span>
+              <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <input type="tel" id="phone" name="phone" class="form-input phone-input" placeholder="(555)-555-5555" required minlength="1" title="Please enter a phone number">
+            <input type="hidden" id="phoneCountryCode" name="phoneCountryCode" value="+1">
+          </div>
+        </div>
+        
+        <!-- Country Dropdown Backdrop (outside form-group) -->
+        <div class="country-dropdown-backdrop" id="countryDropdownBackdrop" style="display: none;"></div>
+        <div class="country-dropdown" id="countryDropdown" style="display: none;">
+          <div class="country-dropdown-header">
+            <h3 class="country-dropdown-title">Select Country Code</h3>
+            <button type="button" class="country-dropdown-close" id="closeCountryDropdown" aria-label="Close country selector">×</button>
+          </div>
+          <input type="text" class="country-search" id="countrySearch" placeholder="Search countries...">
+          <div class="country-list" id="countryList">
+            <!-- Countries will be populated by JavaScript -->
+          </div>
         </div>
         
         <div class="form-group">
           <label class="form-label" for="urgency">Project Budget *</label>
           <select id="urgency" name="urgency" class="form-select" required>
             <option value="">Select Budget</option>
-            <option value="low">50-100 USD</option>
             <option value="medium">100-500 USD</option>
             <option value="high">500-1000 USD</option>
-            <option value="critical">Infinite Money</option>
+            <option value="very-high">1000-2000 USD</option>
+            <option value="critical">2000+</option>
           </select>
         </div>
         
@@ -1158,7 +2537,7 @@
         <div class="form-group">
           <label class="form-label" for="description">What do you want developed? *</label>
           <textarea id="description" name="description" class="form-textarea" 
-                    placeholder="Please describe what you need developed for your project."
+                    placeholder="PLEASE DESCRIBE WHAT YOU NEED DEVELOPED WITH IMMENSE DETAILS."
                     required></textarea>
         </div>
         
@@ -1219,6 +2598,16 @@
     </div>
   </div>
 
+  <!-- Ready to Work Popup -->
+  <div id="readyToWorkPopup" class="ready-popup" aria-hidden="true">
+    <div class="ready-popup-container">
+      <button class="ready-popup-close" id="closeReadyPopup" type="button" aria-label="Close popup">×</button>
+      <h3 class="ready-popup-title">Ready to Work With Us?</h3>
+      <p class="ready-popup-text">Let's bring your technical ideas to life. Fill out an inquiry and we'll get back to you soon.</p>
+      <button class="btn ready-popup-btn" id="readyPopupFormBtn" type="button">Fill Out Your Inquiry Here</button>
+    </div>
+  </div>
+
   <!-- Affiliate Modal -->
   <div id="affiliateModal" class="affiliate-modal" aria-hidden="true">
     <div class="affiliate-container" role="dialog" aria-labelledby="affiliateTitle">
@@ -1268,6 +2657,7 @@
             <ul>
               <li>We'll keep you updated on whether they follow through with the process</li>
               <li>You will receive a percentage of our profit</li>
+              <li>The QR button in the bottom right corner will adapt to your link and you can share this QR when using your affiliate link.</li>
               <li>To negotiate this amount, please email <a href="mailto:russoc2023@fau.edu">russoc2023@fau.edu</a></li>
             </ul>
           </div>
@@ -1472,6 +2862,303 @@
 
       skipBtn.addEventListener("click", () => { done = true; finish(); });
       setTimeout(type, 50);
+    })();
+
+    // ===== Pricing Calculator =====
+    (function pricingCalculator() {
+      const projectTypeSelect = $('#calcProjectType');
+      const complexitySelect = $('#calcComplexity');
+      const timelineSelect = $('#calcTimeline');
+      const supportSelect = $('#calcSupport');
+      const resultElement = $('#calcResult');
+      
+      if (!projectTypeSelect || !resultElement) return;
+      
+      function calculatePrice() {
+        const projectTypeValue = projectTypeSelect.value;
+        const complexityValue = complexitySelect.value;
+        const timelineValue = timelineSelect.value;
+        const supportValue = supportSelect.value;
+        
+        // If no project type selected, show $0
+        if (!projectTypeValue || projectTypeValue === '0') {
+          animatePrice(0);
+          return;
+        }
+        
+        let basePrice = parseFloat(projectTypeValue);
+        const complexityMultiplier = parseFloat(complexityValue) || 1;
+        const timelineMultiplier = parseFloat(timelineValue) || 1;
+        const supportMultiplier = parseFloat(supportValue) || 1;
+        
+        // Calculate price progressively:
+        // Start with base price, multiply by selected multipliers
+        let finalPrice = basePrice;
+        
+        // Apply complexity if selected (not empty string)
+        if (complexityValue && complexityValue !== '0') {
+          finalPrice *= complexityMultiplier;
+        }
+        
+        // Apply timeline if selected (not empty string)
+        if (timelineValue && timelineValue !== '0') {
+          finalPrice *= timelineMultiplier;
+        }
+        
+        // Apply support multiplier if selected (not empty string)
+        if (supportValue && supportValue !== '0') {
+          finalPrice *= supportMultiplier;
+        }
+        
+        finalPrice = Math.round(finalPrice);
+        
+        // Animate the price update
+        animatePrice(finalPrice);
+      }
+      
+      function animatePrice(targetPrice) {
+        const currentPrice = parseInt(resultElement.textContent.replace(/[$,]/g, '')) || 0;
+        const duration = 800; // Animation duration in ms
+        const steps = 30;
+        const increment = (targetPrice - currentPrice) / steps;
+        let currentStep = 0;
+        
+        const timer = setInterval(() => {
+          currentStep++;
+          const newPrice = Math.round(currentPrice + (increment * currentStep));
+          resultElement.textContent = '$' + newPrice.toLocaleString();
+          
+          if (currentStep >= steps) {
+            clearInterval(timer);
+            resultElement.textContent = '$' + targetPrice.toLocaleString();
+          }
+        }, duration / steps);
+      }
+      
+      // Add event listeners to all dropdowns
+      projectTypeSelect.addEventListener('change', calculatePrice);
+      complexitySelect.addEventListener('change', calculatePrice);
+      timelineSelect.addEventListener('change', calculatePrice);
+      supportSelect.addEventListener('change', calculatePrice);
+      
+      // Initial calculation
+      calculatePrice();
+    })();
+
+    // ===== 3D Image Pan Effect =====
+    (function imagePanEffect() {
+      const aboutImage = $('.about-image img');
+      
+      if (!aboutImage) return;
+      
+      aboutImage.addEventListener('mousemove', (e) => {
+        const rect = aboutImage.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        // Calculate rotation angles (max 15 degrees in each direction)
+        const rotateY = ((x - centerX) / centerX) * 15;
+        const rotateX = ((centerY - y) / centerY) * 15;
+        
+        // Apply transform
+        aboutImage.style.transform = `
+          perspective(1000px)
+          rotateX(${rotateX}deg)
+          rotateY(${rotateY}deg)
+          scale3d(1.05, 1.05, 1.05)
+        `;
+      });
+      
+      aboutImage.addEventListener('mouseleave', () => {
+        // Reset to original position
+        aboutImage.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      });
+    })();
+
+    // ===== Footer Widget & Policy Modals =====
+    (function footerHandler() {
+      const privacyBtn = $('#privacyBtn');
+      const termsBtn = $('#termsBtn');
+      const privacyModal = $('#privacyModal');
+      const termsModal = $('#termsModal');
+      const closePrivacyBtn = $('#closePrivacyBtn');
+      const closeTermsBtn = $('#closeTermsBtn');
+      
+      // Open Privacy Policy Modal
+      if (privacyBtn && privacyModal) {
+        privacyBtn.addEventListener('click', () => {
+          document.body.style.overflow = 'hidden';
+          privacyModal.setAttribute('aria-hidden', 'false');
+          requestAnimationFrame(() => {
+            privacyModal.classList.add('show');
+          });
+        });
+      }
+      
+      // Close Privacy Policy Modal
+      function closePrivacyModal() {
+        privacyModal.classList.remove('show');
+        privacyModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+      
+      if (closePrivacyBtn) {
+        closePrivacyBtn.addEventListener('click', closePrivacyModal);
+      }
+      
+      if (privacyModal) {
+        privacyModal.addEventListener('click', (e) => {
+          if (e.target === privacyModal) closePrivacyModal();
+        });
+      }
+      
+      // Open Terms of Service Modal
+      if (termsBtn && termsModal) {
+        termsBtn.addEventListener('click', () => {
+          document.body.style.overflow = 'hidden';
+          termsModal.setAttribute('aria-hidden', 'false');
+          requestAnimationFrame(() => {
+            termsModal.classList.add('show');
+          });
+        });
+      }
+      
+      // Close Terms of Service Modal
+      function closeTermsModal() {
+        termsModal.classList.remove('show');
+        termsModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+      
+      if (closeTermsBtn) {
+        closeTermsBtn.addEventListener('click', closeTermsModal);
+      }
+      
+      if (termsModal) {
+        termsModal.addEventListener('click', (e) => {
+          if (e.target === termsModal) closeTermsModal();
+        });
+      }
+      
+      // Close modals with Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (privacyModal && privacyModal.classList.contains('show')) {
+            closePrivacyModal();
+          }
+          if (termsModal && termsModal.classList.contains('show')) {
+            closeTermsModal();
+          }
+        }
+      });
+    })();
+
+    // ===== Read More / About Section =====
+    (function readMoreHandler() {
+      const readMoreBtn = $('#readMoreBtn');
+      const aboutSection = $('#aboutSection');
+      let readyPopupTimer = null;
+      
+      if (!readMoreBtn || !aboutSection) {
+        console.warn('Read More button or About section not found');
+        return;
+      }
+      
+      readMoreBtn.addEventListener('click', () => {
+        const isExpanded = aboutSection.classList.contains('expanded');
+        const card = $('#card');
+        
+        if (isExpanded) {
+          // Collapse
+          readMoreBtn.classList.remove('expanded');
+          aboutSection.classList.remove('expanded');
+          if (card) {
+            card.classList.remove('about-expanded');
+          }
+          
+          // Clear the popup timer if collapsing
+          if (readyPopupTimer) {
+            clearTimeout(readyPopupTimer);
+            readyPopupTimer = null;
+          }
+          
+          // Smooth scroll back to top of the wrap
+          setTimeout(() => {
+            const wrap = $('.wrap');
+            if (wrap) {
+              wrap.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }, 100);
+        } else {
+          // Expand
+          readMoreBtn.classList.add('expanded');
+          aboutSection.classList.add('expanded');
+          if (card) {
+            card.classList.add('about-expanded');
+          }
+          
+          // Start 45 second timer for popup
+          readyPopupTimer = setTimeout(() => {
+            showReadyPopup();
+          }, 45000); // 45 seconds
+        }
+      });
+    })();
+    
+    // ===== Ready to Work Popup =====
+    (function readyPopupHandler() {
+      const readyPopup = $('#readyToWorkPopup');
+      const closeReadyPopup = $('#closeReadyPopup');
+      const readyPopupFormBtn = $('#readyPopupFormBtn');
+      const openFormBtn = $('#openFormBtn');
+      
+      if (!readyPopup) {
+        console.warn('Ready popup not found');
+        return;
+      }
+      
+      // Show popup
+      window.showReadyPopup = function() {
+        readyPopup.classList.add('show');
+        readyPopup.setAttribute('aria-hidden', 'false');
+      };
+      
+      // Hide popup
+      function hideReadyPopup() {
+        readyPopup.classList.remove('show');
+        readyPopup.setAttribute('aria-hidden', 'true');
+      }
+      
+      // Close popup button
+      if (closeReadyPopup) {
+        closeReadyPopup.addEventListener('click', hideReadyPopup);
+      }
+      
+      // Open form button
+      if (readyPopupFormBtn && openFormBtn) {
+        readyPopupFormBtn.addEventListener('click', () => {
+          hideReadyPopup();
+          // Trigger the main form open button
+          openFormBtn.click();
+        });
+      }
+      
+      // Close on click outside (clicking the backdrop)
+      readyPopup.addEventListener('click', (e) => {
+        if (e.target === readyPopup) {
+          hideReadyPopup();
+        }
+      });
+      
+      // Close on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && readyPopup.classList.contains('show')) {
+          hideReadyPopup();
+        }
+      });
     })();
 
     // ===== Form Modal & EmailJS =====
@@ -1792,7 +3479,14 @@
             const data = JSON.parse(savedData);
             Object.entries(data).forEach(([key, value]) => {
               const field = form.querySelector(`[name="${key}"]`);
-              if (field) field.value = value;
+              if (field) {
+                field.value = value;
+                
+                // Trigger input event for phone field to reformat
+                if (key === 'phone' && field.id === 'phone') {
+                  field.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+              }
             });
           } catch (e) {
             console.warn('Failed to load saved form data:', e);
@@ -1814,6 +3508,30 @@
         document.body.style.overflow = 'hidden';
         modal.setAttribute('aria-hidden', 'false');
         loadFormData();
+        
+        // Load saved country selection when opening modal
+        setTimeout(() => {
+          const savedCountrySelection = getCookie('phoneCountrySelection');
+          if (savedCountrySelection) {
+            try {
+              const { code, dialCode } = JSON.parse(savedCountrySelection);
+              if (code && dialCode) {
+                const flagElement = $('#selectedFlag');
+                const codeElement = $('#selectedCode');
+                const countryCodeInput = $('#phoneCountryCode');
+                
+                if (flagElement && codeElement && countryCodeInput) {
+                  flagElement.src = `media/flags/${code}.svg`;
+                  flagElement.alt = `${code.toUpperCase()} Flag`;
+                  codeElement.textContent = dialCode;
+                  countryCodeInput.value = dialCode;
+                }
+              }
+            } catch (e) {
+              console.warn('Failed to restore country selection in modal:', e);
+            }
+          }
+        }, 100);
         
         // Trigger smooth fade in
         requestAnimationFrame(() => {
@@ -1882,6 +3600,22 @@
       function closeModal() {
         modal.classList.remove('show');
         modal.setAttribute('aria-hidden', 'true');
+        
+        // Close country dropdown if open (defined later in the code)
+        const countryDropdownElement = $('#countryDropdown');
+        const countryDropdownBackdropElement = $('#countryDropdownBackdrop');
+        if (countryDropdownElement && countryDropdownElement.style.display === 'block') {
+          countryDropdownElement.style.display = 'none';
+          if (countryDropdownBackdropElement) {
+            countryDropdownBackdropElement.style.display = 'none';
+          }
+          const countrySelectorElement = $('#countrySelector');
+          if (countrySelectorElement) {
+            countrySelectorElement.classList.remove('open');
+          }
+        }
+        
+        // Restore body overflow
         document.body.style.overflow = '';
         
         // Wait for fade out animation to complete
@@ -1920,6 +3654,8 @@
       function clearFormData() {
         form.reset();
         deleteCookie(COOKIE_NAME);
+        // Note: We intentionally don't clear phoneCountrySelection cookie here
+        // so the user's country preference persists across submissions
       }
 
       // Show loading state
@@ -1993,10 +3729,10 @@
       // Format form data for client email template
       function formatFormData(formData) {
         const budgetLabels = {
-          'low': '50-100 USD',
           'medium': '100-500 USD',
           'high': '500-1000 USD',
-          'critical': 'Infinite Money'
+          'very-high': '1000-2000 USD',
+          'critical': '2000+'
         };
 
         const categoryLabels = {
@@ -2011,7 +3747,9 @@
         // Get form values
         const name = formData.get('name') || '';
         const email = formData.get('email') || '';
-        const phone = formData.get('phone') || 'Not provided';
+        const phoneNumber = formData.get('phone') || '';
+        const phoneCode = formData.get('phoneCountryCode') || '+1';
+        const phone = phoneNumber ? `${phoneCode} ${phoneNumber}` : 'Not provided';
         const urgency = formData.get('urgency') || '';
         const category = formData.get('category') || '';
         const description = formData.get('description') || '';
@@ -2224,6 +3962,22 @@ Submitted: ${new Date().toLocaleString()}`
       // Close modal with Escape key
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
+          // Check country dropdown first (highest priority)
+          const countryDropdownElement = $('#countryDropdown');
+          if (countryDropdownElement && countryDropdownElement.style.display === 'block') {
+            const countryDropdownBackdropElement = $('#countryDropdownBackdrop');
+            countryDropdownElement.style.display = 'none';
+            if (countryDropdownBackdropElement) {
+              countryDropdownBackdropElement.style.display = 'none';
+            }
+            const countrySelectorElement = $('#countrySelector');
+            if (countrySelectorElement) {
+              countrySelectorElement.classList.remove('open');
+            }
+            return; // Stop here, don't close the modal
+          }
+          
+          // Then check modals
           if (modal.classList.contains('show')) {
             closeModal();
           }
@@ -2548,6 +4302,415 @@ Submitted: ${new Date().toLocaleString()}`
       window.addEventListener('beforeunload', saveFormData);
       setupAutoSave();
       document.addEventListener('DOMContentLoaded', loadFormData);
+      
+      // ===== Country Code Selector =====
+      const countrySelector = $('#countrySelector');
+      const countryDropdown = $('#countryDropdown');
+      const countryDropdownBackdrop = $('#countryDropdownBackdrop');
+      const countryDropdownCloseBtn = $('#closeCountryDropdown');
+      const countryList = $('#countryList');
+      const countrySearch = $('#countrySearch');
+      const selectedFlag = $('#selectedFlag');
+      const selectedCode = $('#selectedCode');
+      const phoneCountryCode = $('#phoneCountryCode');
+      const phoneInput = $('#phone');
+      
+      // Popular countries and their data
+      const countries = [
+        { code: 'us', name: 'United States', dialCode: '+1' },
+        { code: 'gb', name: 'United Kingdom', dialCode: '+44' },
+        { code: 'ca', name: 'Canada', dialCode: '+1' },
+        { code: 'au', name: 'Australia', dialCode: '+61' },
+        { code: 'de', name: 'Germany', dialCode: '+49' },
+        { code: 'fr', name: 'France', dialCode: '+33' },
+        { code: 'es', name: 'Spain', dialCode: '+34' },
+        { code: 'it', name: 'Italy', dialCode: '+39' },
+        { code: 'nl', name: 'Netherlands', dialCode: '+31' },
+        { code: 'se', name: 'Sweden', dialCode: '+46' },
+        { code: 'no', name: 'Norway', dialCode: '+47' },
+        { code: 'dk', name: 'Denmark', dialCode: '+45' },
+        { code: 'fi', name: 'Finland', dialCode: '+358' },
+        { code: 'ch', name: 'Switzerland', dialCode: '+41' },
+        { code: 'at', name: 'Austria', dialCode: '+43' },
+        { code: 'be', name: 'Belgium', dialCode: '+32' },
+        { code: 'ie', name: 'Ireland', dialCode: '+353' },
+        { code: 'nz', name: 'New Zealand', dialCode: '+64' },
+        { code: 'jp', name: 'Japan', dialCode: '+81' },
+        { code: 'kr', name: 'South Korea', dialCode: '+82' },
+        { code: 'cn', name: 'China', dialCode: '+86' },
+        { code: 'in', name: 'India', dialCode: '+91' },
+        { code: 'sg', name: 'Singapore', dialCode: '+65' },
+        { code: 'hk', name: 'Hong Kong', dialCode: '+852' },
+        { code: 'mx', name: 'Mexico', dialCode: '+52' },
+        { code: 'br', name: 'Brazil', dialCode: '+55' },
+        { code: 'ar', name: 'Argentina', dialCode: '+54' },
+        { code: 'cl', name: 'Chile', dialCode: '+56' },
+        { code: 'co', name: 'Colombia', dialCode: '+57' },
+        { code: 'pe', name: 'Peru', dialCode: '+51' },
+        { code: 'za', name: 'South Africa', dialCode: '+27' },
+        { code: 'ng', name: 'Nigeria', dialCode: '+234' },
+        { code: 'eg', name: 'Egypt', dialCode: '+20' },
+        { code: 'ae', name: 'United Arab Emirates', dialCode: '+971' },
+        { code: 'sa', name: 'Saudi Arabia', dialCode: '+966' },
+        { code: 'il', name: 'Israel', dialCode: '+972' },
+        { code: 'tr', name: 'Turkey', dialCode: '+90' },
+        { code: 'ru', name: 'Russia', dialCode: '+7' },
+        { code: 'pl', name: 'Poland', dialCode: '+48' },
+        { code: 'cz', name: 'Czech Republic', dialCode: '+420' },
+        { code: 'gr', name: 'Greece', dialCode: '+30' },
+        { code: 'pt', name: 'Portugal', dialCode: '+351' },
+        { code: 'ro', name: 'Romania', dialCode: '+40' },
+        { code: 'hu', name: 'Hungary', dialCode: '+36' },
+        { code: 'th', name: 'Thailand', dialCode: '+66' },
+        { code: 'my', name: 'Malaysia', dialCode: '+60' },
+        { code: 'id', name: 'Indonesia', dialCode: '+62' },
+        { code: 'ph', name: 'Philippines', dialCode: '+63' },
+        { code: 'vn', name: 'Vietnam', dialCode: '+84' },
+        { code: 'pk', name: 'Pakistan', dialCode: '+92' },
+        { code: 'bd', name: 'Bangladesh', dialCode: '+880' },
+        { code: 'ua', name: 'Ukraine', dialCode: '+380' },
+      ];
+      
+      // Sort countries alphabetically by name
+      countries.sort((a, b) => a.name.localeCompare(b.name));
+      
+      // Populate country list
+      function populateCountryList(filterText = '') {
+        const filteredCountries = countries.filter(country => 
+          country.name.toLowerCase().includes(filterText.toLowerCase()) ||
+          country.dialCode.includes(filterText)
+        );
+        
+        countryList.innerHTML = filteredCountries.map(country => `
+          <div class="country-item" data-code="${country.code}" data-dial="${country.dialCode}">
+            <img src="media/flags/${country.code}.svg" alt="${country.name}" class="country-item-flag" onerror="this.style.display='none'">
+            <span class="country-item-name">${country.name}</span>
+            <span class="country-item-code">${country.dialCode}</span>
+          </div>
+        `).join('');
+        
+        // Add click handlers to country items
+        countryList.querySelectorAll('.country-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const code = item.dataset.code;
+            const dialCode = item.dataset.dial;
+            selectCountry(code, dialCode);
+          });
+        });
+      }
+      
+      // Select a country
+      function selectCountry(code, dialCode) {
+        selectedFlag.src = `media/flags/${code}.svg`;
+        selectedFlag.alt = `${code.toUpperCase()} Flag`;
+        selectedCode.textContent = dialCode;
+        phoneCountryCode.value = dialCode;
+        
+        // Save country selection to cookies
+        setCookie('phoneCountrySelection', JSON.stringify({ code: code, dialCode: dialCode }), COOKIE_EXPIRY_DAYS);
+        
+        closeCountryDropdown();
+        
+        // Focus the phone input
+        phoneInput.focus();
+      }
+      
+      // Toggle country dropdown
+      function toggleCountryDropdown() {
+        const isOpen = countryDropdown.style.display === 'block';
+        
+        if (isOpen) {
+          closeCountryDropdown();
+        } else {
+          openCountryDropdown();
+        }
+      }
+      
+      // Open country dropdown
+      function openCountryDropdown() {
+        countryDropdownBackdrop.style.display = 'block';
+        countryDropdown.style.display = 'block';
+        countrySelector.classList.add('open');
+        countrySearch.value = '';
+        populateCountryList();
+        
+        // Body scroll is already prevented by the modal
+        
+        // Focus search input
+        setTimeout(() => {
+          countrySearch.focus();
+        }, 100);
+      }
+      
+      // Close country dropdown
+      function closeCountryDropdown() {
+        countryDropdownBackdrop.style.display = 'none';
+        countryDropdown.style.display = 'none';
+        countrySelector.classList.remove('open');
+        
+        // Don't restore body scroll here - let the modal handle it
+      }
+      
+      // Event listeners for country selector
+      if (countrySelector) {
+        countrySelector.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleCountryDropdown();
+        });
+      }
+      
+      if (countryDropdownCloseBtn) {
+        countryDropdownCloseBtn.addEventListener('click', closeCountryDropdown);
+      }
+      
+      if (countrySearch) {
+        countrySearch.addEventListener('input', (e) => {
+          populateCountryList(e.target.value);
+        });
+        
+        countrySearch.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+      }
+      
+      if (countryDropdown) {
+        countryDropdown.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+      }
+      
+      // Close dropdown when clicking backdrop
+      if (countryDropdownBackdrop) {
+        countryDropdownBackdrop.addEventListener('click', closeCountryDropdown);
+      }
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (countryDropdown && countryDropdown.style.display === 'block') {
+          if (!countryDropdown.contains(e.target) && e.target !== countrySelector) {
+            closeCountryDropdown();
+          }
+        }
+      });
+      
+      // Initialize country list
+      if (countryList) {
+        populateCountryList();
+      }
+      
+      // Load saved country selection
+      function loadSavedCountrySelection() {
+        const savedSelection = getCookie('phoneCountrySelection');
+        if (savedSelection) {
+          try {
+            const { code, dialCode } = JSON.parse(savedSelection);
+            if (code && dialCode) {
+              // Update UI with saved country
+              selectedFlag.src = `media/flags/${code}.svg`;
+              selectedFlag.alt = `${code.toUpperCase()} Flag`;
+              selectedCode.textContent = dialCode;
+              phoneCountryCode.value = dialCode;
+              console.log('📱 Restored country selection:', code, dialCode);
+            }
+          } catch (e) {
+            console.warn('Failed to load saved country selection:', e);
+          }
+        }
+      }
+      
+      // Load saved country selection on page load
+      loadSavedCountrySelection();
+      
+      // Debug function to test country selection persistence
+      window.testCountryPersistence = function() {
+        const saved = getCookie('phoneCountrySelection');
+        if (saved) {
+          const { code, dialCode } = JSON.parse(saved);
+          console.log('📱 Saved country selection:', code, dialCode);
+          console.log('🔍 Current UI state:');
+          console.log('  Flag:', selectedFlag?.src);
+          console.log('  Code:', selectedCode?.textContent);
+          console.log('  Hidden input:', phoneCountryCode?.value);
+        } else {
+          console.log('❌ No saved country selection found');
+        }
+      };
+      
+      // Debug function to clear saved country selection
+      window.clearCountrySelection = function() {
+        deleteCookie('phoneCountrySelection');
+        console.log('🗑️ Cleared saved country selection');
+        console.log('🔄 Refresh the page to see the default country code (US +1)');
+      };
+      
+      // ===== Phone Number Formatting =====
+      if (phoneInput) {
+        let lastValue = '';
+        
+        // Handle backspace/delete at parenthesis boundaries
+        phoneInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' || e.key === 'Delete') {
+            const cursorPos = e.target.selectionStart;
+            const currentValue = e.target.value;
+            const digits = currentValue.replace(/\D/g, '');
+            
+            // If we have exactly 3 digits in format (xxx) and cursor is after )
+            if (digits.length === 3 && currentValue === '(' + digits + ')' && cursorPos === currentValue.length && e.key === 'Backspace') {
+              e.preventDefault();
+              // Remove one digit
+              const newDigits = digits.slice(0, 2);
+              e.target.value = newDigits;
+              // Trigger input event to reformat
+              e.target.dispatchEvent(new Event('input', { bubbles: true }));
+              return;
+            }
+            
+            // If we're at a formatting character position, skip it and delete the digit
+            if (e.key === 'Backspace' && cursorPos > 0) {
+              const charBefore = currentValue[cursorPos - 1];
+              // If character before cursor is ( ) or -, delete the actual digit instead
+              if (charBefore === '(' || charBefore === ')' || charBefore === '-') {
+                e.preventDefault();
+                // Find the actual digit position before the formatting character
+                const digitsBeforeCursor = currentValue.substring(0, cursorPos).replace(/\D/g, '');
+                if (digitsBeforeCursor.length > 0) {
+                  const allDigits = digits;
+                  const newDigits = allDigits.slice(0, digitsBeforeCursor.length - 1) + allDigits.slice(digitsBeforeCursor.length);
+                  e.target.value = newDigits;
+                  e.target.dispatchEvent(new Event('input', { bubbles: true }));
+                  
+                  // Position cursor correctly after reformatting
+                  setTimeout(() => {
+                    const newFormatted = e.target.value;
+                    const newDigitsBeforeCursor = digitsBeforeCursor.slice(0, -1);
+                    let newCursorPos = 0;
+                    let digitCount = 0;
+                    for (let i = 0; i < newFormatted.length && digitCount < newDigitsBeforeCursor.length; i++) {
+                      if (/\d/.test(newFormatted[i])) {
+                        digitCount++;
+                      }
+                      newCursorPos = i + 1;
+                    }
+                    e.target.setSelectionRange(newCursorPos, newCursorPos);
+                  }, 0);
+                }
+                return;
+              }
+            }
+          }
+        });
+        
+        // Format phone number as (xxx)-xxx-xxxx with up to 20 digits
+        phoneInput.addEventListener('input', (e) => {
+          // Get only numbers from input
+          let value = e.target.value.replace(/\D/g, '');
+          
+          // Limit to 20 digits
+          if (value.length > 20) {
+            value = value.slice(0, 20);
+          }
+          
+          // Format the number
+          let formattedValue = '';
+          
+          if (value.length > 0) {
+            // Only add parenthesis if we have 1 or more digits
+            if (value.length === 1 || value.length === 2) {
+              // Just show the digits without parenthesis for easier deletion
+              formattedValue = value;
+            } else if (value.length === 3) {
+              // Show (xxx) when we have exactly 3 digits
+              formattedValue = '(' + value + ')';
+            } else if (value.length > 3 && value.length <= 6) {
+              // (xxx)-xxx
+              formattedValue = '(' + value.substring(0, 3) + ')-' + value.substring(3, 6);
+            } else if (value.length > 6 && value.length <= 10) {
+              // (xxx)-xxx-xxxx
+              formattedValue = '(' + value.substring(0, 3) + ')-' + value.substring(3, 6) + '-' + value.substring(6, 10);
+            } else if (value.length > 10) {
+              // (xxx)-xxx-xxxx-xxxxxxxxxx (for international numbers)
+              formattedValue = '(' + value.substring(0, 3) + ')-' + value.substring(3, 6) + '-' + value.substring(6, 10) + '-' + value.substring(10, 20);
+            }
+          }
+          
+          // Set the formatted value
+          lastValue = formattedValue;
+          e.target.value = formattedValue;
+          
+          // Clear any custom validity message while typing
+          e.target.setCustomValidity('');
+        });
+        
+        // Prevent non-numeric input
+        phoneInput.addEventListener('keypress', (e) => {
+          // Allow: backspace, delete, tab, escape, enter
+          if ([8, 9, 27, 13, 46].includes(e.keyCode) || 
+              // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+              (e.keyCode === 65 && e.ctrlKey === true) ||
+              (e.keyCode === 67 && e.ctrlKey === true) ||
+              (e.keyCode === 86 && e.ctrlKey === true) ||
+              (e.keyCode === 88 && e.ctrlKey === true)) {
+            return;
+          }
+          
+          // Ensure that it is a number and stop the keypress if not
+          if ((e.key < '0' || e.key > '9') && e.key !== 'Backspace' && e.key !== 'Delete') {
+            e.preventDefault();
+          }
+        });
+        
+        // Handle paste event to clean pasted data
+        phoneInput.addEventListener('paste', (e) => {
+          e.preventDefault();
+          
+          // Get pasted data
+          const pastedData = (e.clipboardData || window.clipboardData).getData('text');
+          
+          // Extract only numbers (up to 20 digits)
+          const numbers = pastedData.replace(/\D/g, '').slice(0, 20);
+          
+          // Format and set value
+          let formattedValue = '';
+          
+          if (numbers.length > 0) {
+            if (numbers.length === 1 || numbers.length === 2) {
+              formattedValue = numbers;
+            } else if (numbers.length === 3) {
+              formattedValue = '(' + numbers + ')';
+            } else if (numbers.length > 3 && numbers.length <= 6) {
+              formattedValue = '(' + numbers.substring(0, 3) + ')-' + numbers.substring(3, 6);
+            } else if (numbers.length > 6 && numbers.length <= 10) {
+              formattedValue = '(' + numbers.substring(0, 3) + ')-' + numbers.substring(3, 6) + '-' + numbers.substring(6, 10);
+            } else if (numbers.length > 10) {
+              formattedValue = '(' + numbers.substring(0, 3) + ')-' + numbers.substring(3, 6) + '-' + numbers.substring(6, 10) + '-' + numbers.substring(10, 20);
+            }
+          }
+          
+          phoneInput.value = formattedValue;
+          
+          // Trigger input event for any listeners
+          phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        
+        // Add custom validation for minimum digits
+        phoneInput.addEventListener('blur', (e) => {
+          const digitCount = e.target.value.replace(/\D/g, '').length;
+          if (digitCount > 0 && digitCount < 3) {
+            e.target.setCustomValidity('Phone number must have at least 3 digits');
+          } else {
+            e.target.setCustomValidity('');
+          }
+        });
+        
+        // Debug function to test phone formatting
+        window.testPhoneFormat = function(number) {
+          if (phoneInput) {
+            phoneInput.value = number;
+            phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
+            console.log('📱 Phone formatted to:', phoneInput.value);
+          }
+        };
+      }
     })();
 
     // ===== Affiliate Modal =====
