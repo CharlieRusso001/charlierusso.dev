@@ -465,6 +465,7 @@
           display: block;
           transform-style: preserve-3d;
           perspective: 1000px;
+          filter: grayscale(100%) sepia(20%) hue-rotate(60deg) brightness(0.95);
         }
         
         .about-image img:hover {
@@ -1398,6 +1399,61 @@
       font-style: italic;
     }
     
+    .calc-disclaimer {
+      margin-top: 16px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: clamp(9px, 1.3vw, 10px);
+      opacity: 0.6;
+      font-style: italic;
+      line-height: 1.4;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .result-special-notice {
+      color: var(--text-hero);
+      font-size: clamp(11px, 1.8vw, 13px);
+      margin: 12px 0 8px 0;
+      padding: 12px;
+      background: rgba(0,255,65,0.15);
+      border-left: 3px solid var(--accent-primary);
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      line-height: 1.5;
+    }
+    
+    .result-special-notice strong {
+      color: var(--accent-primary);
+      font-weight: 700;
+    }
+    
+    .manual-estimate-btn {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 12px 24px;
+      background: var(--accent-dim);
+      border: 2px solid var(--accent-border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: clamp(12px, 2vw, 14px);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 0 15px var(--accent-dim);
+    }
+    
+    .manual-estimate-btn:hover {
+      background: var(--accent-bright);
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,255,65,0.4);
+    }
+    
     .payment-info {
       margin-top: 40px;
       padding-top: 32px;
@@ -2230,7 +2286,7 @@
               </a>
             </div>
             <div class="about-text">
-              <p>This is a technical consulting service led by Charles Russo, a prospective University of Chicago student with nearly a decade of experience in engineering and technology. Charles has worked on a wide range of engineering projects, combining innovation with practical expertise.</p>
+              <p>This is a technical consulting service led by Charles Russo, a prospective University of Chicago student with years of experience in engineering and technology. Charles has worked on a wide range of projects, combining innovation with practical expertise.</p>
               <p>We specialize in full-stack software development, hardware development, and a variety of other technical solutions designed to bring your ideas to life. Whether you're building a product from the ground up or need expert guidance on complex systems, we're here to help.</p>
             </div>
           </div>
@@ -2267,8 +2323,8 @@
                   <label for="calcProjectType">Project Type</label>
                   <select id="calcProjectType" class="calc-select">
                     <option value="">Select project type...</option>
-                    <option value="250">Website Design (Basic)</option>
-                    <option value="750">Website Design (Advanced)</option>
+                    <option value="200">Website Design (Basic)</option>
+                    <option value="700">Website Design (Advanced)</option>
                     <option value="2000">Full-Stack Web Application</option>
                     <option value="3000">Mobile App Development</option>
                     <option value="1000">Hardware Prototyping</option>
@@ -2315,8 +2371,13 @@
                 <div class="calc-result">
                   <div class="result-label">Estimated Cost:</div>
                   <div class="result-price" id="calcResult">$0</div>
-                  <div class="result-note">*This is an estimate. Final pricing will be discussed and agreed upon before work begins.  Short time frames are not applicable to all projects.</div>
+                  <button class="manual-estimate-btn" id="manualEstimateBtn" type="button">Click Here for Your Inquiry</button>
+                  <div class="result-special-notice" id="complexProjectNotice" style="display: none;">
+                    <strong>Note:</strong> This type of project's pricing is highly dependent on what you require and may deviate greatly from this estimate.
+                  </div>
                 </div>
+                
+                <div class="calc-disclaimer">*This is an estimate. Final pricing will be discussed and agreed upon before work begins. Short time frames are not applicable to all projects.</div>
               </div>
               
               <div class="payment-info">
@@ -2871,8 +2932,18 @@
       const timelineSelect = $('#calcTimeline');
       const supportSelect = $('#calcSupport');
       const resultElement = $('#calcResult');
+      const complexProjectNotice = $('#complexProjectNotice');
+      const manualEstimateBtn = $('#manualEstimateBtn');
+      const openFormBtn = $('#openFormBtn');
       
       if (!projectTypeSelect || !resultElement) return;
+      
+      // Manual estimate button click handler
+      if (manualEstimateBtn && openFormBtn) {
+        manualEstimateBtn.addEventListener('click', () => {
+          openFormBtn.click();
+        });
+      }
       
       function calculatePrice() {
         const projectTypeValue = projectTypeSelect.value;
@@ -2880,10 +2951,23 @@
         const timelineValue = timelineSelect.value;
         const supportValue = supportSelect.value;
         
-        // If no project type selected, show $0
+        // If no project type selected, show $0 and hide notice
         if (!projectTypeValue || projectTypeValue === '0') {
           animatePrice(0);
+          resultElement.style.fontSize = 'clamp(36px, 8vw, 56px)';
+          if (complexProjectNotice) {
+            complexProjectNotice.style.display = 'none';
+          }
           return;
+        }
+        
+        // Show/hide notice for Full-Stack (2000) or Mobile App (3000) projects
+        if (complexProjectNotice) {
+          if (projectTypeValue === '2000' || projectTypeValue === '3000') {
+            complexProjectNotice.style.display = 'block';
+          } else {
+            complexProjectNotice.style.display = 'none';
+          }
         }
         
         let basePrice = parseFloat(projectTypeValue);
@@ -2910,10 +2994,20 @@
           finalPrice *= supportMultiplier;
         }
         
-        finalPrice = Math.round(finalPrice);
+        // Round up to nearest 10
+        finalPrice = Math.ceil(finalPrice / 10) * 10;
         
-        // Animate the price update
-        animatePrice(finalPrice);
+        // Check if price exceeds an amount
+        if (finalPrice > 20000) {
+          // Show "Manual Estimate Required"
+          resultElement.textContent = 'Manual Estimate Required';
+          resultElement.style.fontSize = 'clamp(24px, 6vw, 36px)';
+        } else {
+          // Show normal price
+          resultElement.style.fontSize = 'clamp(36px, 8vw, 56px)';
+          // Animate the price update
+          animatePrice(finalPrice);
+        }
       }
       
       function animatePrice(targetPrice) {
