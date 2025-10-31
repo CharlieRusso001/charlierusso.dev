@@ -301,7 +301,7 @@
       transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.4s;
     }
     
-    .card.show .card-content .tagline {
+    .card.show.ready .card-content .tagline {
       opacity: 1;
       transform: translateY(0);
     }
@@ -324,9 +324,21 @@
       transition-delay: 1.0s;
     }
     
-    .card.show .card-content .actions > * {
+    .card.show.ready .card-content .actions > * {
       opacity: 1;
       transform: translateY(0);
+    }
+    
+    .card-content .about-section {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 1.0s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .card.show.ready .card-content .about-section {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 1.2s;
     }
 
     p.tagline{ margin: 0 0 20px; color: var(--text-secondary); font-size: clamp(14px, 2.4vw, 18px); }
@@ -368,29 +380,9 @@
 
     footer{ margin-top: clamp(16px, 2.5vw, 24px); font-size: 12px; color: var(--text-footer); opacity:.9; }
 
-    /* Read More Button */
+    /* Read More Button - Hidden */
     .btn-read-more {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 24px;
-      padding: 12px 24px;
-      background: rgba(0,255,65,0.05);
-      border: 1px solid var(--border-primary);
-      border-radius: 12px;
-      color: var(--text-secondary);
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    
-    .card.show .card-content .btn-read-more {
-      opacity: 1;
-      transform: translateY(0);
-      transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1) 1.2s;
+      display: none;
     }
     
     .btn-read-more:hover {
@@ -1576,7 +1568,7 @@
       transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
     }
     
-    .card.show .footer-widget {
+    .card.show.ready .footer-widget {
       opacity: 1;
       transform: translateY(0);
       transition-delay: 1.4s;
@@ -2298,16 +2290,8 @@
           </a>
         </div>
         
-        <!-- Read More Button -->
-        <button class="btn-read-more" id="readMoreBtn" type="button">
-          <svg class="arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Read More About Us
-        </button>
-        
-        <!-- Expandable About Section -->
-        <div class="about-section" id="aboutSection">
+        <!-- About Section -->
+        <div class="about-section expanded" id="aboutSection">
           <div class="about-divider"></div>
           <h2 class="about-title">About</h2>
           <div class="about-content">
@@ -2368,6 +2352,11 @@
                     <option value="700">Simple CAD Design</option>
                     <option value="100">Hourly Technical Consulting</option>
                     <option value="500">Code Review & Optimization</option>
+                    <option value="300">Logo Design</option>
+                    <option value="400">Graphic Design for Clothes</option>
+                    <option value="250">Custom Social Media / Email Templates</option>
+                    <option value="800">2D Animation</option>
+                    <option value="1500">3D Animation</option>
                   </select>
                 </div>
                 
@@ -2628,6 +2617,11 @@
             <option value="3d">3D-Printing / 3D-Modeling</option>
             <option value="electronics">Electronics Prototyping</option>
             <option value="training">Software Training</option>
+            <option value="logo">Logo Design</option>
+            <option value="graphic">Graphic Design for Clothes</option>
+            <option value="templates">Custom Social Media / Email Templates</option>
+            <option value="2d-animation">2D Animation</option>
+            <option value="3d-animation">3D Animation</option>
             <option value="other">Other</option>
           </select>
         </div>
@@ -2949,6 +2943,11 @@
                     currentChar = 0;
                     setTimeout(typeNextChar, 50); // Shorter pause between lines
                   }
+                } else {
+                  // Typing animation complete - fade in the rest of the content
+                  setTimeout(() => {
+                    card.classList.add('ready');
+                  }, 300); // Small delay after typing completes
                 }
               }
               
@@ -2958,7 +2957,25 @@
           }, 150);
       }
 
-      skipBtn.addEventListener("click", () => { done = true; finish(); });
+      skipBtn.addEventListener("click", () => { 
+        done = true; 
+        finish(); 
+        // If skipping, immediately show all content after boot animation
+        setTimeout(() => {
+          card.classList.add('ready');
+          // Also complete the typing text instantly
+          const typingText = $('.typing-text');
+          const line1 = $('.line1');
+          const line2 = $('.line2');
+          const line3 = $('.line3');
+          if (typingText && line1 && line2 && line3) {
+            typingText.style.opacity = '1';
+            line1.textContent = 'DOES YOUR';
+            line2.textContent = 'BUSINESS NEED';
+            line3.textContent = 'TECHNICAL EXPERTISE?';
+          }
+        }, 800); // Wait for boot animation to complete
+      });
       setTimeout(type, 50);
     })();
 
@@ -2978,6 +2995,10 @@
       // Manual estimate button click handler
       if (manualEstimateBtn && openFormBtn) {
         manualEstimateBtn.addEventListener('click', () => {
+          // Mark form as opened to prevent popup
+          if (typeof window.markFormAsOpened === 'function') {
+            window.markFormAsOpened();
+          }
           openFormBtn.click();
         });
       }
@@ -3191,52 +3212,107 @@
     (function readMoreHandler() {
       const readMoreBtn = $('#readMoreBtn');
       const aboutSection = $('#aboutSection');
+      const card = $('#card');
       let readyPopupTimer = null;
       
-      if (!readMoreBtn || !aboutSection) {
-        console.warn('Read More button or About section not found');
+      if (!aboutSection) {
+        console.warn('About section not found');
         return;
       }
       
-      readMoreBtn.addEventListener('click', () => {
-        const isExpanded = aboutSection.classList.contains('expanded');
-        const card = $('#card');
-        
-        if (isExpanded) {
-          // Collapse
-          readMoreBtn.classList.remove('expanded');
-          aboutSection.classList.remove('expanded');
-          if (card) {
-            card.classList.remove('about-expanded');
+      // Since about section is expanded by default, start the popup timer when card shows
+      function startPopupTimerIfExpanded() {
+        if (aboutSection.classList.contains('expanded')) {
+          // Don't start timer if form has already been opened
+          if (window.formHasBeenOpened) {
+            return;
           }
-          
-          // Clear the popup timer if collapsing
+          // Clear any existing timer
           if (readyPopupTimer) {
             clearTimeout(readyPopupTimer);
-            readyPopupTimer = null;
           }
-          
-          // Smooth scroll back to top of the wrap
-          setTimeout(() => {
-            const wrap = $('.wrap');
-            if (wrap) {
-              wrap.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-          }, 100);
-        } else {
-          // Expand
-          readMoreBtn.classList.add('expanded');
-          aboutSection.classList.add('expanded');
-          if (card) {
-            card.classList.add('about-expanded');
-          }
-          
           // Start 45 second timer for popup
           readyPopupTimer = setTimeout(() => {
-            showReadyPopup();
+            if (typeof showReadyPopup === 'function') {
+              showReadyPopup();
+            }
           }, 45000); // 45 seconds
         }
-      });
+      }
+      
+      // Clear popup timer when form is opened
+      function clearPopupTimer() {
+        if (readyPopupTimer) {
+          clearTimeout(readyPopupTimer);
+          readyPopupTimer = null;
+        }
+      }
+      
+      // Expose clearPopupTimer function globally so it can be called when form is opened
+      window.clearReadyPopupTimer = clearPopupTimer;
+      
+      // Listen for form opening events
+      window.addEventListener('formOpened', clearPopupTimer);
+      
+      // If button exists, attach click handler (for backward compatibility)
+      if (readMoreBtn) {
+        readMoreBtn.addEventListener('click', () => {
+          const isExpanded = aboutSection.classList.contains('expanded');
+          
+          if (isExpanded) {
+            // Collapse
+            readMoreBtn.classList.remove('expanded');
+            aboutSection.classList.remove('expanded');
+            if (card) {
+              card.classList.remove('about-expanded');
+            }
+            
+            // Clear the popup timer if collapsing
+            if (readyPopupTimer) {
+              clearTimeout(readyPopupTimer);
+              readyPopupTimer = null;
+            }
+            
+            // Smooth scroll back to top of the wrap
+            setTimeout(() => {
+              const wrap = $('.wrap');
+              if (wrap) {
+                wrap.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }, 100);
+          } else {
+            // Expand
+            readMoreBtn.classList.add('expanded');
+            aboutSection.classList.add('expanded');
+            if (card) {
+              card.classList.add('about-expanded');
+            }
+            
+            startPopupTimerIfExpanded();
+          }
+        });
+      }
+      
+      // Start timer when card shows (since about section is expanded by default)
+      if (card) {
+        // Use MutationObserver to detect when card gets 'show' class
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+              if (card.classList.contains('show')) {
+                startPopupTimerIfExpanded();
+              }
+            }
+          });
+        });
+        
+        observer.observe(card, { attributes: true });
+        
+        // Also check immediately if card already has 'show' class
+        if (card.classList.contains('show')) {
+          startPopupTimerIfExpanded();
+        }
+      }
     })();
     
     // ===== Ready to Work Popup =====
@@ -3246,13 +3322,29 @@
       const readyPopupFormBtn = $('#readyPopupFormBtn');
       const openFormBtn = $('#openFormBtn');
       
+      // Track if user has clicked any button to open the form
+      window.formHasBeenOpened = false;
+      
+      // Function to mark form as opened
+      window.markFormAsOpened = function() {
+        window.formHasBeenOpened = true;
+        // Clear popup timer if it exists
+        if (typeof window.clearReadyPopupTimer === 'function') {
+          window.clearReadyPopupTimer();
+        }
+      };
+      
       if (!readyPopup) {
         console.warn('Ready popup not found');
         return;
       }
       
-      // Show popup
+      // Show popup only if form hasn't been opened
       window.showReadyPopup = function() {
+        // Check if form has been opened - if so, don't show popup
+        if (window.formHasBeenOpened) {
+          return;
+        }
         readyPopup.classList.add('show');
         readyPopup.setAttribute('aria-hidden', 'false');
       };
@@ -3636,6 +3728,11 @@
 
       // Open modal
       function openModal() {
+        // Mark form as opened to prevent popup
+        if (typeof window.markFormAsOpened === 'function') {
+          window.markFormAsOpened();
+        }
+        
         document.body.style.overflow = 'hidden';
         modal.setAttribute('aria-hidden', 'false');
         loadFormData();
@@ -3872,6 +3969,11 @@
           '3d': '3D-Printing / 3D-Modeling',
           'electronics': 'Electronics Prototyping',
           'training': 'Software Training',
+          'logo': 'Logo Design',
+          'graphic': 'Graphic Design for Clothes',
+          'templates': 'Custom Social Media / Email Templates',
+          '2d-animation': '2D Animation',
+          '3d-animation': '3D Animation',
           'other': 'Other'
         };
 
