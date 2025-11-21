@@ -130,9 +130,94 @@
     /* Canvas fills screen behind everything */
     #matrixCanvas{ position:fixed; inset:0; width:100vw; height:100vh; display:block; z-index:0; }
 
-    /* Top label */
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--accent-border);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .navbar.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .navbar-container {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      max-width: 1200px;
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .navbar-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .navbar-link:hover {
+      color: var(--text-hero);
+      background: var(--accent-dim);
+    }
+    
+    .navbar-link.active {
+      color: var(--text-hero);
+      background: var(--accent-dim);
+    }
+    
+    .navbar-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-primary);
+    }
+    
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 10px 12px;
+      }
+      
+      .navbar-container {
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      
+      .navbar-link {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+    }
+
+    /* Top label - now inside navbar */
     .badge{
-      position: absolute; left: 12px; top: 12px; z-index: 5; user-select:none; pointer-events:none;
+      position: absolute; left: 12px; top: 12px; z-index: 60; user-select:none; pointer-events:none;
     }
     .badge .label{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:11px; letter-spacing:.22em; color: var(--text-secondary); opacity:.9; }
     .badge .bar{ height:4px; width:88px; border-radius:999px; background: var(--accent-secondary); margin-top:6px; animation:pulse 1.2s ease-in-out infinite; }
@@ -254,7 +339,7 @@
     .card{
       min-height: 100dvh;
       padding: clamp(12px, 3vw, 28px);
-      padding-top: clamp(50px, 12vh, 200px);
+      padding-top: clamp(80px, 12vh, 200px);
       position: relative;
       display: flex;
       flex-direction: column;
@@ -824,7 +909,7 @@
                   backdrop-filter 0.5s cubic-bezier(0.23, 1, 0.32, 1);
     }
     .form-container{
-      width: min(700px, 100%); max-height: 90vh; overflow-y: auto;
+      width: min(700px, 100%); max-height: 90vh; overflow-y: auto; overflow-x: hidden;
       background: var(--bg-form);
       border: 2px solid var(--border-form);
       border-radius: 12px;
@@ -1210,6 +1295,71 @@
       
       .country-code {
         font-size: 11px;
+      }
+    }
+    
+    .form-agreement{
+      margin-top: 16px;
+      margin-bottom: 16px;
+      font-size: clamp(9px, 0.9vw, 11px);
+      color: rgba(255, 255, 255, 0.7);
+      text-align: center;
+      line-height: 1.4;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+      word-wrap: break-word;
+      padding: 0 8px;
+      box-sizing: border-box;
+    }
+    
+    .form-agreement p{
+      margin: 0;
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+    
+    .form-agreement .form-link-btn{
+      background: none;
+      border: none;
+      color: rgba(0, 255, 65, 0.8);
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 0;
+      font-size: inherit;
+      font-family: inherit;
+      transition: color 0.2s ease;
+      display: inline;
+    }
+    
+    .form-agreement .form-link-btn:hover{
+      color: rgba(0, 255, 65, 1);
+    }
+    
+    .form-agreement a.form-link-btn{
+      text-decoration: underline;
+    }
+    
+    .form-agreement.animate-in{
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    @media (max-width: 768px){
+      .form-agreement{
+        font-size: clamp(8px, 1.2vw, 10px);
+        padding: 0 12px;
+      }
+    }
+    
+    @media (max-width: 480px){
+      .form-agreement{
+        font-size: clamp(7px, 1.5vw, 9px);
+        padding: 0 16px;
       }
     }
     
@@ -1681,6 +1831,8 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-weight: 600;
       letter-spacing: 0.3px;
+      text-decoration: none;
+      display: inline-block;
     }
     
     .footer-link-btn:hover {
@@ -1689,6 +1841,7 @@
       color: var(--text-primary);
       transform: translateY(-1px);
       box-shadow: 0 4px 12px var(--accent-dim);
+      text-decoration: none;
     }
     
     /* Mobile adjustments for footer widget */
@@ -2332,6 +2485,21 @@
 <body>
   <canvas id="matrixCanvas"></canvas>
 
+  <!-- Navbar -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <!-- Static label -->
+    <div class="badge" aria-hidden="true">
+      <div class="label">Charlie Russo</div>
+      <div class="bar"></div>
+    </div>
+    <div class="navbar-container">
+      <a href="./?skipboot" class="navbar-link" data-page="home">Home</a>
+      <a href="about/" class="navbar-link" data-page="about">About</a>
+      <a href="our-work/" class="navbar-link" data-page="our-work">Our work</a>
+      <a href="contact/" class="navbar-link" data-page="contact">Contact</a>
+    </div>
+  </nav>
+
   <!-- Boot overlay -->
   <div id="boot" aria-live="polite">
       <div class="boot-card" role="status" aria-label="Boot sequence">
@@ -2342,12 +2510,6 @@
           <button id="skipBtn" class="btn-skip" type="button">Skip</button>
         </div>
       </div>
-  </div>
-
-  <!-- Static label -->
-  <div class="badge" aria-hidden="true">
-    <div class="label">Charlie Russo</div>
-    <div class="bar"></div>
   </div>
 
   <!-- CTA -->
@@ -2537,8 +2699,8 @@
       <!-- Footer Widget -->
       <div class="footer-widget">
         <span class="footer-copyright">© Charles Russo</span>
-        <button class="footer-link-btn" id="privacyBtn" type="button">Privacy Policy</button>
-        <button class="footer-link-btn" id="termsBtn" type="button">Terms of Service</button>
+        <a href="privacy-policy/" class="footer-link-btn">Privacy Policy</a>
+        <a href="terms/" class="footer-link-btn">Terms of Service</a>
       </div>
     </section>
   </main>
@@ -2763,6 +2925,10 @@
           <button type="button" class="btn-cancel" id="successCloseBtn" style="margin-top: 20px; font-size: 12px; padding: 8px 16px;">Close</button>
         </div>
         
+        <div class="form-agreement">
+          <p>By submitting this form and working with us you agree to our <a href="terms/" class="form-link-btn">terms of service</a> and <a href="privacy-policy/" class="form-link-btn">privacy policy</a>.</p>
+        </div>
+        
         <div class="form-actions">
           <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
           <button type="submit" class="btn-submit" id="submitBtn">Send Request</button>
@@ -2916,6 +3082,17 @@
 
     // ===== Boot Typewriter (~1 second total) =====
     (function boot() {
+      // Check for skipboot parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const shouldSkipBoot = urlParams.has('skipboot');
+      
+      // Remove skipboot parameter from URL after checking
+      if (shouldSkipBoot) {
+        urlParams.delete('skipboot');
+        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '') + window.location.hash;
+        window.history.replaceState({}, document.title, newUrl);
+      }
+      
       const lines = [
         "INIT SYS: waking matrix renderer…",
         "GPU: context ok  ✅  DPR=" + (window.devicePixelRatio || 1),
@@ -2930,43 +3107,8 @@
       const boot = $("#boot");
       const card = $("#card");
 
-      // Build containers per line
-      term.innerHTML = lines.map(() => '<div class="ln"></div>').join("");
-      const nodes = [...term.querySelectorAll(".ln")];
-
-      // Compute total chars to finish in ~600ms
-      const totalDuration = 600;
-      const totalChars = lines.reduce((s,l)=>s+l.length,0);
-      const step = Math.max(1, Math.floor(totalDuration / totalChars));
-
-      let li=0, ci=0, done=false;
-      function type(){
-        if(done) return;
-        const line = lines[li] || "";
-        nodes[li].textContent = (li === lines.length-1 ? "> " : "> ") + line.slice(0, ci+1);
-        // Add blinking cursor to current line
-        nodes.forEach((n,i)=>{
-          n.innerHTML = (i===li)
-            ? n.textContent + '<span class="cursor">█</span>'
-            : n.textContent;
-        });
-
-        ci++;
-        if(ci < line.length){
-          setTimeout(type, step);
-        } else {
-          li++; ci=0;
-          if(li < lines.length){
-            setTimeout(type, step);
-          } else {
-            // Completed: fade out boot, reveal card
-            done = true;
-            setTimeout(() => finish(), 200);
-          }
-        }
-      }
-
-      function finish(){
+      // Define finish function before using it
+      function finish(skipTyping = false){
         const bootCard = $('.boot-card');
         const terminal = $('.terminal');
         const bootControls = $('.boot-controls');
@@ -3021,48 +3163,145 @@
               boot.style.display = 'none';
               card.classList.add('show');
               
-              // Start typing animation
-              typingText.style.opacity = '1';
-              
-              // Animate each line with typing effect (2x faster, smoother)
-              const lines = ['DOES YOUR', 'BUSINESS NEED', 'TECHNICAL EXPERTISE?'];
-              const lineElements = [line1, line2, line3];
-              
-              let currentLine = 0;
-              let currentChar = 0;
-              
-              function typeNextChar() {
-                if (currentLine < lines.length) {
-                  const line = lines[currentLine];
-                  const element = lineElements[currentLine];
-                  
-                  if (currentChar < line.length) {
-                    element.textContent = line.slice(0, currentChar + 1);
-                    currentChar++;
-                    setTimeout(typeNextChar, 25); // Much faster, smoother typing
-                  } else {
-                    // Move to next line
-                    currentLine++;
-                    currentChar = 0;
-                    setTimeout(typeNextChar, 50); // Shorter pause between lines
+              if (skipTyping) {
+                // Skip typing animation - text is already set, fade-in is handled separately
+                // Immediately show rest of content
+                setTimeout(() => {
+                  card.classList.add('ready');
+                  // Animate navbar in
+                  const navbar = document.querySelector('.navbar');
+                  if (navbar) {
+                    setTimeout(() => {
+                      navbar.classList.add('show');
+                    }, 200);
                   }
-                } else {
-                  // Typing animation complete - fade in the rest of the content
-                  setTimeout(() => {
-                    card.classList.add('ready');
-                  }, 300); // Small delay after typing completes
+                }, 300);
+              } else {
+                // Start typing animation
+                typingText.style.opacity = '1';
+                
+                // Animate each line with typing effect (2x faster, smoother)
+                const lines = ['DOES YOUR', 'BUSINESS NEED', 'TECHNICAL EXPERTISE?'];
+                const lineElements = [line1, line2, line3];
+                
+                let currentLine = 0;
+                let currentChar = 0;
+                
+                function typeNextChar() {
+                  if (currentLine < lines.length) {
+                    const line = lines[currentLine];
+                    const element = lineElements[currentLine];
+                    
+                    if (currentChar < line.length) {
+                      element.textContent = line.slice(0, currentChar + 1);
+                      currentChar++;
+                      setTimeout(typeNextChar, 25); // Much faster, smoother typing
+                    } else {
+                      // Move to next line
+                      currentLine++;
+                      currentChar = 0;
+                      setTimeout(typeNextChar, 50); // Shorter pause between lines
+                    }
+                  } else {
+                    // Typing animation complete - fade in the rest of the content
+                    setTimeout(() => {
+                      card.classList.add('ready');
+                      // Animate navbar in
+                      const navbar = document.querySelector('.navbar');
+                      if (navbar) {
+                        setTimeout(() => {
+                          navbar.classList.add('show');
+                        }, 200);
+                      }
+                    }, 300); // Small delay after typing completes
+                  }
                 }
+                
+                // Start typing animation immediately
+                setTimeout(typeNextChar, 100);
               }
-              
-              // Start typing animation immediately
-              setTimeout(typeNextChar, 100);
             }
           }, 150);
       }
 
-      skipBtn.addEventListener("click", () => { 
-        done = true; 
-        finish(); 
+      // If skipboot parameter is present, skip animation immediately
+      if (shouldSkipBoot) {
+        // Set text content first before calling finish
+        const typingText = $('.typing-text');
+        const line1 = $('.line1');
+        const line2 = $('.line2');
+        const line3 = $('.line3');
+        if (typingText && line1 && line2 && line3) {
+          line1.textContent = 'DOES YOUR';
+          line2.textContent = 'BUSINESS NEED';
+          line3.textContent = 'TECHNICAL EXPERTISE?';
+          
+          // Set up fade-in transition
+          typingText.style.opacity = '0';
+          typingText.style.transition = 'opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1)';
+        }
+        
+        setTimeout(() => {
+          // Call finish with skipTyping=true to prevent typing animation
+          finish(true);
+          // Fade in the hero text smoothly after boot animation completes
+          setTimeout(() => {
+            if (typingText) {
+              requestAnimationFrame(() => {
+                typingText.style.opacity = '1';
+              });
+            }
+            // Animate navbar in
+            const navbar = document.querySelector('.navbar');
+            if (navbar) {
+              setTimeout(() => {
+                navbar.classList.add('show');
+              }, 200);
+            }
+          }, 700);
+        }, 50);
+        return;
+      }
+
+      // Build containers per line
+      term.innerHTML = lines.map(() => '<div class="ln"></div>').join("");
+      const nodes = [...term.querySelectorAll(".ln")];
+
+      // Compute total chars to finish in ~600ms
+      const totalDuration = 600;
+      const totalChars = lines.reduce((s,l)=>s+l.length,0);
+      const step = Math.max(1, Math.floor(totalDuration / totalChars));
+
+      let li=0, ci=0, done=false;
+      function type(){
+        if(done) return;
+        const line = lines[li] || "";
+        nodes[li].textContent = (li === lines.length-1 ? "> " : "> ") + line.slice(0, ci+1);
+        // Add blinking cursor to current line
+        nodes.forEach((n,i)=>{
+          n.innerHTML = (i===li)
+            ? n.textContent + '<span class="cursor">█</span>'
+            : n.textContent;
+        });
+
+        ci++;
+        if(ci < line.length){
+          setTimeout(type, step);
+        } else {
+          li++; ci=0;
+          if(li < lines.length){
+            setTimeout(type, step);
+          } else {
+            // Completed: fade out boot, reveal card
+            done = true;
+            setTimeout(() => finish(), 200);
+          }
+        }
+      }
+
+      skipBtn.addEventListener("click", () => {
+        done = true;
+        finish();
         // If skipping, immediately show all content after boot animation
         setTimeout(() => {
           card.classList.add('ready');
@@ -3076,6 +3315,13 @@
             line1.textContent = 'DOES YOUR';
             line2.textContent = 'BUSINESS NEED';
             line3.textContent = 'TECHNICAL EXPERTISE?';
+          }
+          // Animate navbar in
+          const navbar = document.querySelector('.navbar');
+          if (navbar) {
+            setTimeout(() => {
+              navbar.classList.add('show');
+            }, 200);
           }
         }, 800); // Wait for boot animation to complete
       });
@@ -3235,80 +3481,7 @@
 
     // ===== Footer Widget & Policy Modals =====
     (function footerHandler() {
-      const privacyBtn = $('#privacyBtn');
-      const termsBtn = $('#termsBtn');
-      const privacyModal = $('#privacyModal');
-      const termsModal = $('#termsModal');
-      const closePrivacyBtn = $('#closePrivacyBtn');
-      const closeTermsBtn = $('#closeTermsBtn');
-      
-      // Open Privacy Policy Modal
-      if (privacyBtn && privacyModal) {
-        privacyBtn.addEventListener('click', () => {
-          document.body.style.overflow = 'hidden';
-          privacyModal.setAttribute('aria-hidden', 'false');
-          requestAnimationFrame(() => {
-            privacyModal.classList.add('show');
-          });
-        });
-      }
-      
-      // Close Privacy Policy Modal
-      function closePrivacyModal() {
-        privacyModal.classList.remove('show');
-        privacyModal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-      }
-      
-      if (closePrivacyBtn) {
-        closePrivacyBtn.addEventListener('click', closePrivacyModal);
-      }
-      
-      if (privacyModal) {
-        privacyModal.addEventListener('click', (e) => {
-          if (e.target === privacyModal) closePrivacyModal();
-        });
-      }
-      
-      // Open Terms of Service Modal
-      if (termsBtn && termsModal) {
-        termsBtn.addEventListener('click', () => {
-          document.body.style.overflow = 'hidden';
-          termsModal.setAttribute('aria-hidden', 'false');
-          requestAnimationFrame(() => {
-            termsModal.classList.add('show');
-          });
-        });
-      }
-      
-      // Close Terms of Service Modal
-      function closeTermsModal() {
-        termsModal.classList.remove('show');
-        termsModal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-      }
-      
-      if (closeTermsBtn) {
-        closeTermsBtn.addEventListener('click', closeTermsModal);
-      }
-      
-      if (termsModal) {
-        termsModal.addEventListener('click', (e) => {
-          if (e.target === termsModal) closeTermsModal();
-        });
-      }
-      
-      // Close modals with Escape key
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          if (privacyModal && privacyModal.classList.contains('show')) {
-            closePrivacyModal();
-          }
-          if (termsModal && termsModal.classList.contains('show')) {
-            closeTermsModal();
-          }
-        }
-      });
+      // Privacy Policy and Terms of Service are now separate pages, not modals
     })();
 
     // ===== Read More / About Section =====
@@ -3925,6 +4098,14 @@
             });
           }, formGroups.length * 300 + 200);
         }
+        
+        // Animate form agreement last (after form actions)
+        const formAgreement = form.querySelector('.form-agreement');
+        if (formAgreement) {
+          setTimeout(() => {
+            formAgreement.classList.add('animate-in');
+          }, formGroups.length * 300 + 200 + 600); // After form actions animation completes
+        }
       }
 
       // Close modal
@@ -3965,6 +4146,7 @@
         // Restore form fields
         const formGroups = form.querySelectorAll('.form-group');
         const formActions = form.querySelector('.form-actions');
+        const formAgreement = form.querySelector('.form-agreement');
         
         formGroups.forEach(group => {
           group.style.opacity = '1';
@@ -3976,6 +4158,12 @@
           formActions.style.opacity = '1';
           formActions.style.pointerEvents = 'auto';
           formActions.style.display = '';
+        }
+        
+        if (formAgreement) {
+          formAgreement.classList.remove('animate-in');
+          formAgreement.style.opacity = '';
+          formAgreement.style.pointerEvents = '';
         }
         
         // Don't reset form data - keep user input
@@ -3994,6 +4182,7 @@
         // Fade out form fields
         const formGroups = form.querySelectorAll('.form-group');
         const formActions = form.querySelector('.form-actions');
+        const formAgreement = form.querySelector('.form-agreement');
         
         formGroups.forEach(group => {
           group.style.opacity = '0';
@@ -4003,6 +4192,11 @@
         if (formActions) {
           formActions.style.opacity = '0';
           formActions.style.pointerEvents = 'none';
+        }
+        
+        if (formAgreement) {
+          formAgreement.style.opacity = '0';
+          formAgreement.style.pointerEvents = 'none';
         }
         
         // Show loading animation
@@ -4027,6 +4221,7 @@
         // Hide form fields
         const formGroups = form.querySelectorAll('.form-group');
         const formActions = form.querySelector('.form-actions');
+        const formAgreement = form.querySelector('.form-agreement');
         
         formGroups.forEach(group => {
           group.style.opacity = '0';
@@ -4036,6 +4231,11 @@
         if (formActions) {
           formActions.style.opacity = '0';
           formActions.style.pointerEvents = 'none';
+        }
+        
+        if (formAgreement) {
+          formAgreement.style.opacity = '0';
+          formAgreement.style.pointerEvents = 'none';
         }
         
         if (successMessage) {
@@ -5279,27 +5479,31 @@ Submitted: ${new Date().toLocaleString()}`
       }
 
       // Event listeners
-      openAffiliateBtn.addEventListener('click', openAffiliateModal);
-      closeAffiliateBtn.addEventListener('click', closeAffiliateModal);
-      cancelAffiliateBtn.addEventListener('click', closeAffiliateModal);
-      closeAffiliateSuccessBtn.addEventListener('click', closeAffiliateModal);
-      affiliateForm.addEventListener('submit', handleAffiliateForm);
-      copyLinkBtn.addEventListener('click', () => {
-        // Use the actual encoded link for copying (stored in dataset)
-        const actualLink = generatedLink.dataset.actualLink || generatedLink.textContent;
-        copyToClipboard(actualLink);
-      });
-      shareLinkBtn.addEventListener('click', shareLink);
+      if (openAffiliateBtn) openAffiliateBtn.addEventListener('click', openAffiliateModal);
+      if (closeAffiliateBtn) closeAffiliateBtn.addEventListener('click', closeAffiliateModal);
+      if (cancelAffiliateBtn) cancelAffiliateBtn.addEventListener('click', closeAffiliateModal);
+      if (closeAffiliateSuccessBtn) closeAffiliateSuccessBtn.addEventListener('click', closeAffiliateModal);
+      if (affiliateForm) affiliateForm.addEventListener('submit', handleAffiliateForm);
+      if (copyLinkBtn) {
+        copyLinkBtn.addEventListener('click', () => {
+          // Use the actual encoded link for copying (stored in dataset)
+          const actualLink = generatedLink ? (generatedLink.dataset.actualLink || generatedLink.textContent) : '';
+          if (actualLink) copyToClipboard(actualLink);
+        });
+      }
+      if (shareLinkBtn) shareLinkBtn.addEventListener('click', shareLink);
 
       // Close modal when clicking outside
-      affiliateModal.addEventListener('click', (e) => {
-        if (e.target === affiliateModal) closeAffiliateModal();
-      });
+      if (affiliateModal) {
+        affiliateModal.addEventListener('click', (e) => {
+          if (e.target === affiliateModal) closeAffiliateModal();
+        });
+      }
 
       // Close modal with Escape key
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-          if (affiliateModal.classList.contains('show')) {
+          if (affiliateModal && affiliateModal.classList.contains('show')) {
             closeAffiliateModal();
           }
         }
@@ -5383,6 +5587,39 @@ Submitted: ${new Date().toLocaleString()}`
           referrer: currentReferrer
         };
       };
+    })();
+
+    // ===== Navbar Active State =====
+    (function navbarActive() {
+      const currentPath = window.location.pathname;
+      const navbarLinks = document.querySelectorAll('.navbar-link');
+      
+      navbarLinks.forEach(link => {
+        const linkPage = link.getAttribute('data-page');
+        
+        // Remove active class from all links
+        link.classList.remove('active');
+        
+        // Set active based on current path
+        // Home page (root or index.html)
+        if (currentPath === '/' || currentPath === '/index.html' || (currentPath.endsWith('/') && !currentPath.includes('/about') && !currentPath.includes('/our-work') && !currentPath.includes('/contact'))) {
+          if (linkPage === 'home') {
+            link.classList.add('active');
+          }
+        } else if (currentPath.includes('/about')) {
+          if (linkPage === 'about') {
+            link.classList.add('active');
+          }
+        } else if (currentPath.includes('/our-work')) {
+          if (linkPage === 'our-work') {
+            link.classList.add('active');
+          }
+        } else if (currentPath.includes('/contact')) {
+          if (linkPage === 'contact') {
+            link.classList.add('active');
+          }
+        }
+      });
     })();
   </script>
 </body>

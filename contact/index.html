@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact | Technical Consulting by Charles Russo</title>
+  <meta name="description" content="Contact Charles Russo for technical consulting services." />
+  <link rel="icon" href="../media/charlie.jpg" type="image/jpeg" />
+  <script src="https://unpkg.com/qr-code-styling@1.9.2/lib/qr-code-styling.js"></script>
+  <style>
+    :root{
+      --bg-primary: #000;
+      --bg-card: rgba(0,0,0,0.72);
+      --bg-form: rgba(0,0,0,0.85);
+      --text-primary: #d7ffe1;
+      --text-secondary: #a9f5b3;
+      --text-muted: rgb(132, 255, 176);
+      --text-hero: #84ffb0;
+      --accent-primary: #00ff41;
+      --accent-secondary: #18ff66;
+      --accent-dim: rgba(0,255,65,0.18);
+      --accent-border: rgba(0,255,65,0.25);
+      --border-form: #00ff41;
+      --shadow-glow: 0 0 20px rgba(0,255,65,0.4);
+      --shadow-form: 0 20px 60px rgba(0,255,65,0.15);
+    }
+    *{ box-sizing: border-box; }
+    html, body{ 
+      height:100%; 
+      margin:0; 
+      background:var(--bg-primary); 
+      color:var(--text-primary); 
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      overflow-x: hidden;
+    }
+    body{ 
+      padding: 20px;
+      padding-top: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+    #matrixCanvas{ 
+      position:fixed; 
+      inset:0; 
+      width:100vw; 
+      height:100vh; 
+      display:block; 
+      z-index:0; 
+    }
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--accent-border);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    
+    .navbar-container {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      max-width: 1200px;
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .navbar-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .navbar-link:hover {
+      color: var(--text-hero);
+      background: var(--accent-dim);
+    }
+    
+    .navbar-link.active {
+      color: var(--text-hero);
+      background: var(--accent-dim);
+    }
+    
+    .navbar-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-primary);
+    }
+    
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 10px 12px;
+      }
+      
+      .navbar-container {
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      
+      .navbar-link {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+    }
+    
+    /* Top label - now inside navbar */
+    .badge{
+      position: absolute; left: 12px; top: 12px; z-index: 60; user-select:none; pointer-events:none;
+    }
+    .badge .label{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:11px; letter-spacing:.22em; color: var(--text-secondary); opacity:.9; }
+    .badge .bar{ height:4px; width:88px; border-radius:999px; background: var(--accent-secondary); margin-top:6px; animation:pulse 1.2s ease-in-out infinite; }
+    @keyframes pulse{ 0%,100%{opacity:.35} 50%{opacity:1} }
+    .container{
+      width: min(800px, 100%);
+      max-width: 100%;
+      background: var(--bg-form);
+      border: 2px solid var(--border-form);
+      border-radius: 12px;
+      padding: clamp(24px, 4vw, 48px);
+      box-shadow: var(--shadow-form);
+      margin-top: 20px;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 2;
+    }
+    .header{
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--accent-border);
+      text-align: center;
+    }
+    h1{
+      color: var(--text-hero);
+      font-size: clamp(28px, 5vw, 40px);
+      margin: 0 0 10px 0;
+      font-weight: 700;
+      text-shadow: var(--shadow-glow);
+    }
+    .content {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.8;
+      text-align: center;
+    }
+    .contact-methods {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-top: 32px;
+    }
+    .contact-method {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 20px;
+      background: rgba(0,255,65,0.05);
+      border: 2px solid var(--border-primary);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    .contact-method:hover {
+      border-color: var(--accent-border);
+      background: rgba(0,255,65,0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px var(--accent-dim);
+    }
+    .contact-icon {
+      color: var(--accent-primary);
+      flex-shrink: 0;
+    }
+    .contact-info {
+      text-align: left;
+    }
+    .contact-label {
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .contact-value {
+      color: var(--text-hero);
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .contact-value:hover {
+      color: var(--accent-primary);
+    }
+    .btn-contact {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 24px;
+      padding: 12px 24px;
+      background: var(--accent-dim);
+      border: 2px solid var(--accent-border);
+      border-radius: 8px;
+      color: var(--text-hero);
+      font-weight: 700;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .btn-contact:hover {
+      background: rgba(0,255,65,0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,255,65,0.4);
+    }
+    /* QR Code Button */
+    .qr-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 2px solid var(--accent-border);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 100;
+      box-shadow: var(--shadow-glow);
+    }
+    .qr-button:hover {
+      transform: scale(1.1);
+      background: rgba(0,255,65,0.2);
+      box-shadow: 0 0 20px rgba(0,255,65,0.3);
+    }
+    /* QR Code Modal */
+    .qr-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(3px);
+      display: none;
+      place-items: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .qr-modal.show {
+      display: grid;
+      opacity: 1;
+    }
+    .qr-container {
+      background: var(--bg-card);
+      border: 2px solid var(--accent-border);
+      border-radius: 12px;
+      padding: 24px;
+      position: relative;
+      text-align: center;
+      max-width: 90%;
+      width: 360px;
+      transform: scale(0.95);
+      opacity: 0;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-glow);
+    }
+    .qr-modal.show .qr-container {
+      transform: scale(1);
+      opacity: 1;
+    }
+    .qr-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 30px;
+      height: 30px;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.3s ease;
+    }
+    .qr-close:hover {
+      color: var(--text-primary);
+    }
+    .qr-container h3 {
+      color: var(--text-primary);
+      font-size: 20px;
+      margin: 0 0 24px 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .qr-container p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin: 24px 0 0 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    #qrCode {
+      background: #00ff4147;
+      padding: 16px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 280px;
+    }
+    #qrCode svg {
+      max-width: 100%;
+      height: auto;
+    }
+    #qrCode svg rect,
+    #qrCode svg path,
+    #qrCode svg circle,
+    #qrCode svg polygon {
+      opacity: 0;
+      animation: sectionFadeOpacity 0.5s ease-in-out forwards, var(--qr-blink-animation, none);
+    }
+    @keyframes sectionFadeOpacity {
+      to { opacity: 1; }
+    }
+    @keyframes dotBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    @media (max-width: 768px){
+      body{ padding: 12px; padding-top: 70px; }
+      .container{ padding: 20px; margin-top: 10px; }
+      .content{ font-size: 14px; }
+      .contact-method { flex-direction: column; text-align: center; }
+      .contact-info { text-align: center; }
+      .qr-button{ bottom: 16px; right: 16px; width: 44px; height: 44px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrixCanvas"></canvas>
+  
+  <!-- Navbar -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <!-- Static label -->
+    <div class="badge" aria-hidden="true">
+      <div class="label">Charlie Russo</div>
+      <div class="bar"></div>
+    </div>
+    <div class="navbar-container">
+      <a href="../?skipboot" class="navbar-link" data-page="home">Home</a>
+      <a href="../about/" class="navbar-link" data-page="about">About</a>
+      <a href="../our-work/" class="navbar-link" data-page="our-work">Our work</a>
+      <a href="../contact/" class="navbar-link active" data-page="contact">Contact</a>
+    </div>
+  </nav>
+  
+  <div class="container">
+    <div class="header">
+      <h1>Contact</h1>
+    </div>
+    
+    <div class="content">
+      <p>Ready to get started? Reach out to us through any of the following methods:</p>
+      
+      <div class="contact-methods">
+        <div class="contact-method">
+          <svg class="contact-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"></path>
+            <path d="m4 7 8 6 8-6"></path>
+          </svg>
+          <div class="contact-info">
+            <div class="contact-label">Email</div>
+            <a href="mailto:russoc2023@fau.edu" class="contact-value">russoc2023@fau.edu</a>
+          </div>
+        </div>
+      </div>
+      
+      <a href="../?skipboot" class="btn-contact">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"></path>
+          <path d="m4 7 8 6 8-6"></path>
+        </svg>
+        Fill Out Your Inquiry Here
+      </a>
+    </div>
+  </div>
+
+  <!-- QR Code Button -->
+  <button id="qrButton" class="qr-button" aria-label="Show QR Code">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7"></rect>
+      <rect x="14" y="3" width="7" height="7"></rect>
+      <rect x="14" y="14" width="7" height="7"></rect>
+      <rect x="3" y="14" width="7" height="7"></rect>
+    </svg>
+  </button>
+
+  <!-- QR Code Modal -->
+  <div id="qrModal" class="qr-modal" aria-hidden="true">
+    <div class="qr-container">
+      <button type="button" class="qr-close" id="closeQrBtn" aria-label="Close QR Code">×</button>
+      <h3>Scan to Visit</h3>
+      <div id="qrCode">
+        <!-- Dynamic QR code will be generated here -->
+      </div>
+      <p id="qrDescription">Scan this QR code with your phone's camera to visit this website</p>
+    </div>
+  </div>
+
+  <script>
+    const $ = (sel) => document.querySelector(sel);
+
+    // ===== Matrix Canvas =====
+    (function matrix() {
+      const canvas = document.getElementById("matrixCanvas");
+      const ctx = canvas.getContext("2d");
+      const FONT_FAMILY = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono','Courier New', monospace";
+      const BASE_FONT_SIZE = 18;
+      const TRAIL_FADE = 0.04;
+      const CHARS = ("アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン" +
+                      "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@$%#*-+=<>" +
+                      "abcdefghijklmnopqrstuvwxyz").split("");
+
+      let width=0, height=0, dpr=1, fontSize=BASE_FONT_SIZE, columns=0, drops=[];
+      function resize(){
+        dpr = window.devicePixelRatio || 1;
+        width = canvas.clientWidth = window.innerWidth;
+        height = canvas.clientHeight = window.innerHeight;
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        fontSize = Math.max(14, Math.min(BASE_FONT_SIZE, Math.floor(width / 40)));
+        ctx.font = fontSize + "px " + FONT_FAMILY;
+        columns = Math.max(1, Math.floor(width / fontSize));
+        drops = new Array(columns).fill(1 + Math.floor(Math.random() * 50));
+      }
+      function frame(){
+        ctx.fillStyle = "rgba(0,0,0,"+TRAIL_FADE+")";
+        ctx.fillRect(0,0,width,height);
+        ctx.fillStyle = "#00ff4a";
+        ctx.textBaseline = "top";
+        for(let i=0;i<columns;i++){
+          const char = CHARS[(Math.random()*CHARS.length)|0];
+          const x = i * fontSize;
+          const y = drops[i] * fontSize;
+          ctx.fillText(char, x, y);
+          if (y > height && Math.random() > 0.992) drops[i] = 0;
+          drops[i]++;
+        }
+        requestAnimationFrame(frame);
+      }
+      resize();
+      ctx.fillStyle = "#000"; ctx.fillRect(0,0,width,height);
+      requestAnimationFrame(frame);
+      window.addEventListener("resize", () => { resize(); ctx.clearRect(0,0,width,height); });
+    })();
+
+    // ===== QR Code functionality =====
+    const qrButton = $('#qrButton');
+    const qrModal = $('#qrModal');
+    const closeQrBtn = $('#closeQrBtn');
+    const qrCodeContainer = $('#qrCode');
+    const qrDescription = $('#qrDescription');
+    let qrCodeInstance = null;
+
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    function generateQRCode() {
+      const currentUrl = window.location.href;
+      const urlParams = new URLSearchParams(window.location.search);
+      const referrerEmail = urlParams.get('ref');
+      
+      if (referrerEmail && isValidEmail(referrerEmail)) {
+        qrDescription.textContent = `Scan this QR code to visit with referral from ${referrerEmail}`;
+      } else {
+        qrDescription.textContent = 'Scan this QR code with your phone\'s camera to visit this website';
+      }
+
+      if (qrCodeInstance) {
+        qrCodeInstance.clear();
+      }
+
+      qrCodeContainer.innerHTML = '';
+
+      const isMobile = window.innerWidth <= 480;
+      const qrSize = isMobile ? 240 : 280;
+
+      qrCodeInstance = new QRCodeStyling({
+        width: qrSize,
+        height: qrSize,
+        data: currentUrl,
+        margin: 6,
+        type: 'svg',
+        qrOptions: {
+          errorCorrectionLevel: 'Q'
+        },
+        backgroundOptions: { 
+          color: 'transparent'
+        },
+        dotsOptions: { 
+          type: 'dots',
+          color: '#00ff41'
+        },
+        cornersSquareOptions: { 
+          type: 'extra-rounded',
+          color: '#00ff41'
+        },
+        cornersDotOptions: { 
+          type: 'dot',
+          color: '#00ff41'
+        }
+      });
+
+      qrCodeInstance.append(qrCodeContainer);
+      
+      setTimeout(() => {
+        const qrSvg = qrCodeContainer.querySelector('svg');
+        if (qrSvg) {
+          const rects = Array.from(qrSvg.querySelectorAll('rect'));
+          const paths = Array.from(qrSvg.querySelectorAll('path'));
+          const circles = Array.from(qrSvg.querySelectorAll('circle'));
+          const polygons = Array.from(qrSvg.querySelectorAll('polygon'));
+          const allElements = [...rects, ...paths, ...circles, ...polygons];
+          
+          if (allElements.length > 0) {
+            const maxDelay = 0.6;
+            allElements.forEach((el) => {
+              const delay = Math.random() * maxDelay;
+              el.style.animationDelay = `${delay.toFixed(3)}s`;
+            });
+          }
+        }
+      }, 100);
+    }
+
+    function openQrModal() {
+      generateQRCode();
+      qrModal.style.display = 'grid';
+      requestAnimationFrame(() => {
+        qrModal.classList.add('show');
+        qrModal.setAttribute('aria-hidden', 'false');
+      });
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeQrModal() {
+      qrModal.classList.remove('show');
+      qrModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      setTimeout(() => {
+        qrModal.style.display = 'none';
+      }, 300);
+    }
+
+    if (qrButton) qrButton.addEventListener('click', openQrModal);
+    if (closeQrBtn) closeQrBtn.addEventListener('click', closeQrModal);
+    if (qrModal) {
+      qrModal.addEventListener('click', (e) => {
+        if (e.target === qrModal) closeQrModal();
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (qrModal && qrModal.classList.contains('show')) {
+          closeQrModal();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+
