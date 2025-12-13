@@ -1266,19 +1266,35 @@
     }
 
     function openQrModal() {
+      // Clear any existing QR code first
+      if (qrCodeContainer) {
+        qrCodeContainer.innerHTML = '';
+      }
+      
+      // Generate fresh QR code with current URL before opening
       generateQRCode();
+      
       qrModal.style.display = 'grid';
       requestAnimationFrame(() => {
         qrModal.classList.add('show');
         qrModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
       });
-      document.body.style.overflow = 'hidden';
     }
 
     function closeQrModal() {
       qrModal.classList.remove('show');
       qrModal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+      
+      // Clear the QR code instance and container immediately
+      if (qrCodeInstance) {
+        qrCodeInstance = null;
+      }
+      if (qrCodeContainer) {
+        qrCodeContainer.innerHTML = '';
+      }
+      
       setTimeout(() => {
         qrModal.style.display = 'none';
       }, 300);
