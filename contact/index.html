@@ -7,6 +7,7 @@
   <meta name="description" content="Contact Charles Russo for technical consulting services." />
   <link rel="icon" href="../media/charlie.jpg" type="image/jpeg" />
   <script src="https://unpkg.com/qr-code-styling@1.9.2/lib/qr-code-styling.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     :root{
       --bg-primary: #000;
@@ -57,7 +58,7 @@
       top: 0;
       left: 0;
       right: 0;
-      z-index: 50;
+      z-index: 40;
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--accent-border);
@@ -339,13 +340,35 @@
       margin-bottom: 40px;
       position: relative;
       z-index: 2;
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+      animation: fadeInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
+    
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
     .header{
       margin-bottom: 30px;
       padding-bottom: 20px;
       border-bottom: 1px solid var(--accent-border);
       text-align: center;
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: fadeInDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
     }
+    
+    @keyframes fadeInDown {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
     h1{
       color: var(--text-hero);
       font-size: clamp(28px, 5vw, 40px);
@@ -358,6 +381,60 @@
       font-size: 15px;
       line-height: 1.8;
       text-align: center;
+    }
+    
+    .content > p:first-of-type {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUpStagger 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s forwards;
+    }
+    
+    @keyframes fadeInUpStagger {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .contact-methods {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUpStagger 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s forwards;
+    }
+    
+    .contact-method {
+      opacity: 0;
+      transform: translateX(-30px) scale(0.95);
+      animation: slideInScale 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    
+    @keyframes slideInScale {
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+    
+    .contact-method:nth-child(1) { animation-delay: 0.8s; }
+    
+    .btn-contact {
+      opacity: 0;
+      transform: translateY(20px) scale(0.9);
+      animation: fadeInUpBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 1.0s forwards;
+    }
+    
+    @keyframes fadeInUpBounce {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+      }
+      60% {
+        transform: translateY(-5px) scale(1.05);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
     .contact-methods {
       display: flex;
@@ -421,6 +498,9 @@
       text-decoration: none;
       transition: all 0.3s ease;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      cursor: pointer;
+      position: relative;
+      z-index: 10;
     }
     .btn-contact:hover {
       background: rgba(0,255,65,0.2);
@@ -553,6 +633,525 @@
       .contact-method { flex-direction: column; text-align: center; }
       .contact-info { text-align: center; }
       .qr-button{ bottom: 16px; right: 16px; width: 44px; height: 44px; }
+      #formModal{ padding: 12px; }
+      .form-container{ width: 100%; max-height: 95vh; padding: 16px; }
+    }
+    
+    /* Form Modal Styles - Copied from main page */
+    #formModal{
+      position: fixed; inset: 0; z-index: 100;
+      display: grid; place-items: center; padding: 20px;
+      background: rgba(0,0,0,0);
+      backdrop-filter: blur(0px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1), 
+                  background-color 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  backdrop-filter 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  visibility 0s linear 0.5s;
+    }
+    #formModal.show{ 
+      opacity: 1;
+      visibility: visible;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1), 
+                  background-color 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  backdrop-filter 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .form-container{
+      width: min(700px, 100%); max-height: 90vh; overflow-y: auto; overflow-x: hidden;
+      background: var(--bg-form);
+      border: 2px solid var(--border-form);
+      border-radius: 12px;
+      padding: clamp(16px, 3vw, 24px);
+      box-shadow: 
+        0 30px 100px rgba(0,255,65,0.25),
+        0 10px 40px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(0,255,65,0.1);
+      position: relative;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      opacity: 0;
+      transform: scale(0.7) translateY(60px);
+      transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform, opacity;
+    }
+    #formModal.show .form-container{
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    .form-header{
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; padding-bottom: 12px;
+      border-bottom: 1px solid #00ff41;
+    }
+    .form-title{
+      font-size: clamp(16px, 3vw, 20px);
+      color: var(--text-hero); margin: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      text-shadow: var(--shadow-glow);
+      letter-spacing: 1px;
+    }
+    .form-title:before{ content: "> "; }
+    .close-btn{
+      background: rgba(0,0,0,0.8); 
+      border: 1px solid var(--border-form); 
+      color: var(--text-hero);
+      font-size: 16px; cursor: pointer; 
+      padding: 4px 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      transition: all 0.2s;
+    }
+    .close-btn:hover{ 
+      background: rgba(0,255,65,0.1); 
+      box-shadow: var(--shadow-glow);
+    }
+    .form-group{
+      margin-bottom: 16px;
+      transform: translateX(-40px);
+      opacity: 0;
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .form-group.animate-in{
+      transform: translateX(0);
+      opacity: 1;
+    }
+    .form-label{
+      display: block; margin-bottom: 6px;
+      color: var(--text-secondary); font-weight: 400;
+      font-size: 13px; letter-spacing: 0.5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: all 0.4s ease-out;
+    }
+    .form-label.animate-in{
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .form-label:before{ content: "$ "; color: var(--text-hero); }
+    .form-input, .form-textarea, .form-select{
+      width: 100%; padding: 10px 12px;
+      background: rgba(0,0,0,0.8);
+      border: 1px solid var(--border-form);
+      border-radius: 0; color: var(--text-muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      box-shadow: inset 0 0 10px var(--accent-dim);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .form-input.animate-in, .form-textarea.animate-in, .form-select.animate-in{
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus{
+      outline: none;
+      border-color: rgba(0,255,65,0.5);
+      background: var(--bg-form);
+      box-shadow: 
+        inset 0 0 10px var(--accent-border),
+        var(--shadow-glow);
+      color: var(--text-primary);
+    }
+    .form-textarea{
+      resize: vertical; min-height: 80px;
+      line-height: 1.4;
+    }
+    .form-select{
+      cursor: pointer;
+    }
+    .form-select option{
+      background: #000; color: #84ffb0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .form-input::placeholder, .form-textarea::placeholder{
+      color: rgba(132,255,176,0.5);
+      font-style: italic;
+    }
+    .phone-input-container {
+      display: flex;
+      gap: 8px;
+      position: relative;
+    }
+    .country-selector {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 12px;
+      background: rgba(0,0,0,0.8);
+      border: 1px solid var(--border-form);
+      color: var(--text-muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: inset 0 0 10px var(--accent-dim);
+      min-width: 110px;
+      white-space: nowrap;
+    }
+    .country-selector:hover {
+      border-color: rgba(0,255,65,0.5);
+      background: var(--bg-form);
+    }
+    .country-flag {
+      width: 20px;
+      height: 15px;
+      object-fit: cover;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .country-code {
+      color: var(--text-primary);
+      font-weight: 600;
+      flex: 1;
+    }
+    .dropdown-arrow {
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: transform 0.3s;
+    }
+    .country-selector.open .dropdown-arrow {
+      transform: rotate(180deg);
+    }
+    .phone-input {
+      flex: 1;
+      min-width: 0;
+    }
+    .country-dropdown {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 400px;
+      max-height: 80vh;
+      background: var(--bg-form);
+      border: 2px solid var(--border-form);
+      border-radius: 12px;
+      box-shadow: 
+        0 30px 100px rgba(0,255,65,0.3),
+        0 20px 60px rgba(0,0,0,0.9);
+      z-index: 10000;
+      overflow: hidden;
+      animation: dropdownFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .country-dropdown-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      animation: backdropFadeIn 0.3s ease-out;
+    }
+    @keyframes backdropFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes dropdownFadeIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+    .country-dropdown-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--border-form);
+    }
+    .country-dropdown-title {
+      color: var(--text-hero);
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      text-shadow: var(--shadow-glow);
+      letter-spacing: 0.5px;
+    }
+    .country-dropdown-close {
+      background: rgba(0,0,0,0.8);
+      border: 1px solid var(--border-form);
+      color: var(--text-hero);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 2px 8px;
+      line-height: 1;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      transition: all 0.2s;
+      border-radius: 4px;
+    }
+    .country-dropdown-close:hover {
+      background: rgba(0,255,65,0.1);
+      box-shadow: var(--shadow-glow);
+      transform: scale(1.1);
+    }
+    .country-search {
+      width: 100%;
+      padding: 10px 12px;
+      background: rgba(0,0,0,0.8);
+      border: none;
+      border-bottom: 1px solid var(--border-form);
+      color: var(--text-primary);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      outline: none;
+    }
+    .country-search::placeholder {
+      color: rgba(132,255,176,0.5);
+    }
+    .country-search:focus {
+      background: var(--bg-form);
+      box-shadow: inset 0 0 10px var(--accent-dim);
+    }
+    .country-list {
+      max-height: calc(80vh - 160px);
+      overflow-y: auto;
+      padding: 4px;
+    }
+    .country-list::-webkit-scrollbar {
+      width: 8px;
+    }
+    .country-list::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.8);
+    }
+    .country-list::-webkit-scrollbar-thumb {
+      background: var(--accent-border);
+      border-radius: 4px;
+    }
+    .country-list::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-secondary);
+    }
+    .country-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+    }
+    .country-item:hover {
+      background: var(--accent-dim);
+      color: var(--text-primary);
+    }
+    .country-item-flag {
+      width: 24px;
+      height: 18px;
+      object-fit: cover;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .country-item-name {
+      flex: 1;
+      color: var(--text-muted);
+    }
+    .country-item-code {
+      color: var(--text-hero);
+      font-weight: 600;
+      margin-left: auto;
+    }
+    .country-item.selected {
+      background: var(--accent-dim);
+      color: var(--text-primary);
+    }
+    .form-agreement{
+      margin-top: 16px;
+      margin-bottom: 16px;
+      font-size: clamp(9px, 0.9vw, 11px);
+      color: rgba(255, 255, 255, 0.7);
+      text-align: center;
+      line-height: 1.4;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+      word-wrap: break-word;
+      padding: 0 8px;
+      box-sizing: border-box;
+    }
+    .form-agreement p{
+      margin: 0;
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+    .form-agreement .form-link-btn{
+      background: none;
+      border: none;
+      color: rgba(0, 255, 65, 0.8);
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 0;
+      font-size: inherit;
+      font-family: inherit;
+      transition: color 0.2s ease;
+      display: inline;
+    }
+    .form-agreement .form-link-btn:hover{
+      color: rgba(0, 255, 65, 1);
+    }
+    .form-agreement a.form-link-btn{
+      text-decoration: underline;
+    }
+    .form-agreement.animate-in{
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .form-actions{
+      display: flex; gap: 12px; margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(0,255,65,0.3);
+    }
+    .btn-submit{
+      flex: 1; min-height: 40px;
+      background: rgba(0,0,0,0.8);
+      border: 1px solid #00ff41;
+      color: var(--text-hero);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 700; font-size: 14px;
+      cursor: pointer; transition: all 0.3s;
+      letter-spacing: 1px;
+    }
+    .btn-submit:hover{
+      background: rgba(0,255,65,0.1);
+      box-shadow: var(--shadow-glow);
+      text-shadow: var(--shadow-glow);
+    }
+    .btn-submit:disabled{
+      opacity: 0.5; cursor: not-allowed;
+      background: rgba(0,0,0,0.8);
+      box-shadow: none; text-shadow: none;
+    }
+    .btn-cancel{
+      padding: 10px 20px;
+      background: rgba(0,0,0,0.8);
+      border: 1px solid var(--text-muted);
+      color: var(--text-muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 600; cursor: pointer;
+      transition: all 0.3s; font-size: 14px;
+    }
+    .btn-cancel:hover{
+      background: rgba(0,255,65,0.1);
+      border-color: var(--text-muted);
+      box-shadow: var(--shadow-glow);
+    }
+    .loading{
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: #00ff41;
+      font-size: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      text-align: center;
+      padding: 20px;
+      background: rgba(0,255,65,0.05);
+      border: 1px solid #00ff41;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      opacity: 0;
+      transition: opacity 0.3s ease-out;
+    }
+    .loading.show{
+      display: flex;
+      opacity: 1;
+    }
+    .loading-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .loading-content:before{
+      content: "> ";
+      color: #00ff41;
+    }
+    .spinner{
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--accent-border);
+      border-top: 2px solid #00ff41;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    .loading-dots {
+      display: inline-flex;
+      gap: 4px;
+    }
+    .loading-dots span {
+      width: 4px;
+      height: 4px;
+      background: #00ff41;
+      border-radius: 50%;
+      animation: loadingDots 1.4s ease-in-out infinite both;
+    }
+    .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0s; }
+    @keyframes spin{ 0%{ transform: rotate(0deg); } 100%{ transform: rotate(360deg); } }
+    @keyframes loadingDots {
+      0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    .success-message{
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.95);
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+      color: #00ff41;
+      font-size: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      border: 2px solid #00ff41;
+      background: rgba(0,255,65,0.1);
+      margin: 0;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(0,255,65,0.2);
+      min-height: 120px;
+      width: 90%;
+      max-width: 400px;
+      opacity: 0;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.3s ease-out;
+    }
+    .success-message.show{
+      display: flex;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .success-message h3{
+      margin: 0 0 16px 0;
+      font-size: 20px;
+      text-shadow: var(--shadow-glow);
+      font-weight: 700;
+    }
+    .success-message h3:before{ content: "> "; }
+    .success-message p{ 
+      margin: 0;
+      opacity: 0.9; 
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: 400px;
     }
   </style>
 </head>
@@ -640,13 +1239,13 @@
         </div>
       </div>
       
-      <a href="../?skipboot" class="btn-contact">
+      <button class="btn-contact" id="openFormBtn" type="button" onclick="if(window.openInquiryForm) window.openInquiryForm(); else console.error('openInquiryForm not available'); return false;">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"></path>
           <path d="m4 7 8 6 8-6"></path>
         </svg>
         Fill Out Your Inquiry Here
-      </a>
+      </button>
     </div>
   </div>
 
@@ -911,7 +1510,440 @@
         }
       }
     });
+    
+    // ===== Inquiry Form Modal =====
+    function initInquiryForm() {
+      const EMAILJS_CONFIG = {
+        publicKey: 'koG6eWbBRll3MwQU9',
+        serviceId: 'service_0r9aneq',
+        templateId: 'template_4uw5t74',
+        referralServiceId: 'service_0r9aneq',
+        referralTemplateId: 'template_4uw5t74'
+      };
+      
+      // Initialize EmailJS if available
+      if (typeof emailjs !== 'undefined') {
+        emailjs.init(EMAILJS_CONFIG.publicKey);
+      }
+      
+      const modal = $('#formModal');
+      const openBtn = $('#openFormBtn');
+      const closeBtn = $('#closeFormBtn');
+      const cancelBtn = $('#cancelBtn');
+      const form = $('#helpForm');
+      const submitBtn = $('#submitBtn');
+      const loadingState = $('#loadingState');
+      const successMessage = $('#successMessage');
+      const successCloseBtn = $('#successCloseBtn');
+      
+      if (!modal || !openBtn || !form) {
+        console.error('Form elements not found:', { modal, openBtn, form });
+        return;
+      }
+      
+      function openModal() {
+        console.log('openModal called');
+        if (!modal) {
+          console.error('Modal not found in openModal!');
+          return;
+        }
+        document.body.style.overflow = 'hidden';
+        modal.setAttribute('aria-hidden', 'false');
+        requestAnimationFrame(() => {
+          modal.classList.add('show');
+          setTimeout(() => {
+            animateFormElements();
+          }, 700);
+        });
+      }
+      
+      // Make openModal available globally as fallback
+      window.openInquiryForm = openModal;
+      
+      function closeModal() {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        setTimeout(() => {
+          resetForm();
+        }, 500);
+      }
+      
+      function resetForm() {
+        loadingState.classList.remove('show');
+        successMessage.classList.remove('show');
+        submitBtn.disabled = false;
+        const formGroups = form.querySelectorAll('.form-group');
+        const formActions = form.querySelector('.form-actions');
+        const formAgreement = form.querySelector('.form-agreement');
+        formGroups.forEach(group => {
+          group.style.opacity = '1';
+          group.style.pointerEvents = 'auto';
+        });
+        if (formActions) {
+          formActions.style.opacity = '1';
+          formActions.style.pointerEvents = 'auto';
+        }
+        if (formAgreement) {
+          formAgreement.classList.remove('animate-in');
+        }
+      }
+      
+      function animateFormElements() {
+        const formGroups = form.querySelectorAll('.form-group');
+        const formActions = form.querySelector('.form-actions');
+        formGroups.forEach((group, index) => {
+          setTimeout(() => {
+            group.classList.add('animate-in');
+            const label = group.querySelector('.form-label');
+            const input = group.querySelector('.form-input, .form-textarea, .form-select');
+            if (label) {
+              setTimeout(() => label.classList.add('animate-in'), 200);
+            }
+            if (input) {
+              setTimeout(() => input.classList.add('animate-in'), 400);
+            }
+          }, index * 300);
+        });
+        if (formActions) {
+          setTimeout(() => {
+            formActions.style.opacity = '0';
+            formActions.style.transform = 'translateY(20px)';
+            formActions.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+            requestAnimationFrame(() => {
+              formActions.style.opacity = '1';
+              formActions.style.transform = 'translateY(0)';
+            });
+          }, formGroups.length * 300 + 200);
+        }
+        const formAgreement = form.querySelector('.form-agreement');
+        if (formAgreement) {
+          setTimeout(() => {
+            formAgreement.classList.add('animate-in');
+          }, formGroups.length * 300 + 200 + 600);
+        }
+      }
+      
+      function showLoading() {
+        const formGroups = form.querySelectorAll('.form-group');
+        const formActions = form.querySelector('.form-actions');
+        const formAgreement = form.querySelector('.form-agreement');
+        formGroups.forEach(group => {
+          group.style.opacity = '0';
+          group.style.pointerEvents = 'none';
+        });
+        if (formActions) {
+          formActions.style.opacity = '0';
+          formActions.style.pointerEvents = 'none';
+        }
+        if (formAgreement) {
+          formAgreement.style.opacity = '0';
+          formAgreement.style.pointerEvents = 'none';
+        }
+        setTimeout(() => {
+          loadingState.classList.add('show');
+        }, 300);
+        submitBtn.disabled = true;
+      }
+      
+      function showSuccess() {
+        loadingState.classList.remove('show');
+        const formGroups = form.querySelectorAll('.form-group');
+        const formActions = form.querySelector('.form-actions');
+        const formAgreement = form.querySelector('.form-agreement');
+        formGroups.forEach(group => {
+          group.style.opacity = '0';
+          group.style.pointerEvents = 'none';
+        });
+        if (formActions) {
+          formActions.style.opacity = '0';
+          formActions.style.pointerEvents = 'none';
+        }
+        if (formAgreement) {
+          formAgreement.style.opacity = '0';
+          formAgreement.style.pointerEvents = 'none';
+        }
+        successMessage.classList.add('show');
+        setTimeout(() => {
+          closeModal();
+          form.reset();
+        }, 4000);
+      }
+      
+      function showError(message) {
+        loadingState.classList.remove('show');
+        submitBtn.disabled = false;
+        alert('Error: ' + message + '\n\nPlease try again or contact russoc2023@fau.edu directly.');
+      }
+      
+      async function submitForm(e) {
+        e.preventDefault();
+        if (!EMAILJS_CONFIG.publicKey || EMAILJS_CONFIG.publicKey === 'YOUR_PUBLIC_KEY') {
+          alert('EmailJS is not configured yet. Please provide your EmailJS credentials.');
+          return;
+        }
+        
+        showLoading();
+        
+        try {
+          const formData = new FormData(form);
+          const budgetLabels = {
+            'medium': '100-500 USD',
+            'high': '500-1000 USD',
+            'very-high': '1000-2000 USD',
+            'critical': '2000+'
+          };
+          const categoryLabels = {
+            'web': 'Website Development',
+            'software': 'Backend Development',
+            '3d': '3D-Printing / 3D-Modeling',
+            'electronics': 'Electronics Prototyping',
+            'training': 'Software Training',
+            'logo': 'Logo Design',
+            'graphic': 'Graphic Design for Clothes',
+            'templates': 'Custom Social Media / Email Templates',
+            '2d-animation': '2D Animation',
+            '3d-animation': '3D Animation',
+            'other': 'Other'
+          };
+          
+          const name = formData.get('name') || '';
+          const email = formData.get('email') || '';
+          const phoneNumber = formData.get('phone') || '';
+          const phoneCode = formData.get('phoneCountryCode') || '+1';
+          const phone = phoneNumber ? `${phoneCode} ${phoneNumber}` : 'Not provided';
+          const urgency = formData.get('urgency') || '';
+          const category = formData.get('category') || '';
+          const description = formData.get('description') || '';
+          const website = formData.get('device') || 'Not provided';
+          
+          const templateParams = {
+            to_name: 'Charlie Russo',
+            to_email: 'russoc2023@fau.edu',
+            from_name: name,
+            from_email: email,
+            reply_to: email,
+            name: name,
+            email: email,
+            phone: phone,
+            urgency: urgency,
+            category: category,
+            description: description,
+            device: website,
+            project_budget: budgetLabels[urgency] || urgency,
+            project_category: categoryLabels[category] || category,
+            project_description: description,
+            existing_website: website,
+            client_name: name,
+            client_email: email,
+            timestamp: new Date().toLocaleString(),
+            message: `NEW PROJECT INQUIRY
+
+Client: ${name}
+Email: ${email}
+Phone: ${phone}
+Website: ${website}
+
+Project Budget: ${budgetLabels[urgency] || urgency}
+Project Category: ${categoryLabels[category] || category}
+
+Project Description:
+${description}
+
+Submitted: ${new Date().toLocaleString()}`
+          };
+          
+          const response = await emailjs.send(
+            EMAILJS_CONFIG.serviceId,
+            EMAILJS_CONFIG.templateId,
+            templateParams,
+            EMAILJS_CONFIG.publicKey
+          );
+          
+          if (response.status === 200 || response.text === 'OK') {
+            showSuccess();
+          } else {
+            throw new Error('Failed to send email. Status: ' + response.status);
+          }
+        } catch (error) {
+          console.error('Form submission error:', error);
+          showError(error.message || 'Failed to send your inquiry. Please try again.');
+        }
+      }
+      
+      if (openBtn) {
+        openBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Open button clicked!');
+          openModal();
+        });
+        console.log('Open button event listener attached');
+      } else {
+        console.error('openBtn is null!');
+      }
+      if (closeBtn) {
+        closeBtn.addEventListener('click', closeModal);
+      }
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeModal);
+      }
+      if (successCloseBtn) {
+        successCloseBtn.addEventListener('click', () => {
+          closeModal();
+          form.reset();
+        });
+      }
+      if (form) {
+        form.addEventListener('submit', submitForm);
+      }
+      
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+      
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('show')) {
+          closeModal();
+        }
+      });
+    }
+    
+    // Initialize form when DOM is ready
+    function initializeForm() {
+      try {
+        initInquiryForm();
+      } catch (error) {
+        console.error('Error initializing inquiry form:', error);
+        // Retry after a short delay
+        setTimeout(() => {
+          try {
+            initInquiryForm();
+          } catch (retryError) {
+            console.error('Retry failed:', retryError);
+          }
+        }, 500);
+      }
+    }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeForm);
+    } else {
+      // DOM already loaded, but wait a bit to ensure all elements are ready
+      setTimeout(initializeForm, 100);
+    }
   </script>
+  
+  <!-- Form Modal -->
+  <div id="formModal" aria-hidden="true">
+    <div class="form-container" role="dialog" aria-labelledby="formTitle">
+      <div class="form-header">
+        <h2 id="formTitle" class="form-title">Technical Help Request</h2>
+        <button class="close-btn" id="closeFormBtn" type="button" aria-label="Close form">&times;</button>
+      </div>
+      
+      <form id="helpForm">
+        <div class="form-group">
+          <label class="form-label" for="name">Full Name *</label>
+          <input type="text" id="name" name="name" class="form-input" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address *</label>
+          <input type="email" id="email" name="email" class="form-input" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="phone">Phone Number *</label>
+          <div class="phone-input-container">
+            <button type="button" class="country-selector" id="countrySelector" aria-label="Select country code">
+              <img src="../media/flags/us.svg" alt="US Flag" class="country-flag" id="selectedFlag">
+              <span class="country-code" id="selectedCode">+1</span>
+              <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <input type="tel" id="phone" name="phone" class="form-input phone-input" placeholder="(555)-555-5555" required minlength="1" title="Please enter a phone number">
+            <input type="hidden" id="phoneCountryCode" name="phoneCountryCode" value="+1">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="urgency">Project Budget *</label>
+          <select id="urgency" name="urgency" class="form-select" required>
+            <option value="">Select Budget</option>
+            <option value="medium">100-500 USD</option>
+            <option value="high">500-1000 USD</option>
+            <option value="very-high">1000-2000 USD</option>
+            <option value="critical">2000+</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="category">Issue Category *</label>
+          <select id="category" name="category" class="form-select" required>
+            <option value="">Select category</option>
+            <option value="web">Website Development</option>
+            <option value="software">Backened Development</option>
+            <option value="3d">3D-Printing / 3D-Modeling</option>
+            <option value="electronics">Electronics Prototyping</option>
+            <option value="training">Software Training</option>
+            <option value="logo">Logo Design</option>
+            <option value="graphic">Graphic Design for Clothes</option>
+            <option value="templates">Custom Social Media / Email Templates</option>
+            <option value="2d-animation">2D Animation</option>
+            <option value="3d-animation">3D Animation</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="description">What do you want developed? *</label>
+          <textarea id="description" name="description" class="form-textarea" 
+                    placeholder="PLEASE DESCRIBE WHAT YOU NEED DEVELOPED WITH IMMENSE DETAILS."
+                    required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="device">Your Website (if it exists)</label>
+          <input type="text" id="device" name="device" class="form-input" 
+                 placeholder="domain.com">
+        </div>
+        
+        <div class="loading" id="loadingState">
+          <div class="loading-content">
+            <div class="spinner"></div>
+            <span>Sending your request</span>
+            <div class="loading-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <div style="font-size: 12px; opacity: 0.8; margin-top: 8px;">
+            Processing your inquiry and sending notifications
+          </div>
+        </div>
+        
+        <div class="success-message" id="successMessage">
+          <h3>✅ Your inquiry has been sent out!</h3>
+          <p>Check your email for extra information. I'll get back to you as soon as possible.</p>
+          <button type="button" class="btn-cancel" id="successCloseBtn" style="margin-top: 20px; font-size: 12px; padding: 8px 16px;">Close</button>
+        </div>
+        
+        <div class="form-agreement">
+          <p>By submitting this form and working with us you agree to our <a href="../terms/" class="form-link-btn">terms of service</a> and <a href="../privacy-policy/" class="form-link-btn">privacy policy</a>.</p>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn-submit" id="submitBtn">Send Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </body>
 </html>
 

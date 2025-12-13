@@ -57,7 +57,7 @@
       top: 0;
       left: 0;
       right: 0;
-      z-index: 50;
+      z-index: 40;
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--accent-border);
@@ -328,7 +328,7 @@
     .badge .bar{ height:4px; width:88px; border-radius:999px; background: var(--accent-secondary); margin-top:6px; animation:pulse 1.2s ease-in-out infinite; }
     @keyframes pulse{ 0%,100%{opacity:.35} 50%{opacity:1} }
     .container{
-      width: min(1000px, 100%);
+      width: min(1400px, 100%);
       max-width: 100%;
       background: var(--bg-form);
       border: 2px solid var(--border-form);
@@ -339,13 +339,35 @@
       margin-bottom: 40px;
       position: relative;
       z-index: 2;
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+      animation: fadeInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
+    
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
     .header{
       margin-bottom: 30px;
       padding-bottom: 20px;
       border-bottom: 1px solid var(--accent-border);
       text-align: center;
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: fadeInDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
     }
+    
+    @keyframes fadeInDown {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
     h1{
       color: var(--text-hero);
       font-size: clamp(28px, 5vw, 40px);
@@ -358,6 +380,86 @@
       font-size: 15px;
       line-height: 1.8;
     }
+    
+    .content > p:first-of-type {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUpStagger 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s forwards;
+    }
+    
+    @keyframes fadeInUpStagger {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .clients-section {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUpStagger 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s forwards;
+    }
+    
+    .clients-logos {
+      opacity: 0;
+      transform: scale(0.8);
+      animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.8s forwards;
+    }
+    
+    @keyframes scaleIn {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    .service-card {
+      opacity: 0;
+      transform: translateY(30px) rotateX(15deg);
+      animation: cardFlipIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    
+    @keyframes cardFlipIn {
+      to {
+        opacity: 1;
+        transform: translateY(0) rotateX(0deg);
+      }
+    }
+    
+    .service-card:nth-child(1) { animation-delay: 0.2s; }
+    .service-card:nth-child(2) { animation-delay: 0.3s; }
+    .service-card:nth-child(3) { animation-delay: 0.4s; }
+    .service-card:nth-child(4) { animation-delay: 0.5s; }
+    .service-card:nth-child(5) { animation-delay: 0.6s; }
+    .service-card:nth-child(6) { animation-delay: 0.7s; }
+    .service-card:nth-child(7) { animation-delay: 0.8s; }
+    .service-card:nth-child(8) { animation-delay: 0.9s; }
+    .service-card:nth-child(9) { animation-delay: 1.0s; }
+    
+    .content h2:not(:first-of-type) {
+      opacity: 0;
+      transform: translateX(-30px);
+      animation: slideInFromLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    
+    @keyframes slideInFromLeft {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .content h2:nth-of-type(2) { animation-delay: 1.2s; }
+    .content h2:nth-of-type(3) { animation-delay: 1.4s; }
+    
+    .content p:not(:first-of-type) {
+      opacity: 0;
+      transform: translateY(15px);
+      animation: fadeInUpStagger 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    
+    .content p:nth-of-type(2) { animation-delay: 1.3s; }
+    .content p:nth-of-type(3) { animation-delay: 1.5s; }
     .content h2 {
       color: var(--text-primary);
       font-size: 20px;
@@ -401,6 +503,118 @@
       height: auto;
       object-fit: contain;
       transition: all 0.3s ease;
+    }
+    
+    /* Services Grid */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 32px;
+    }
+    
+    @media (max-width: 1200px) {
+      .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    .service-card {
+      background: rgba(0, 255, 65, 0.05);
+      border: 2px solid rgba(0, 255, 65, 0.2);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .service-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: var(--accent-primary);
+      background: rgba(0, 255, 65, 0.1);
+      box-shadow: 0 20px 60px rgba(0, 255, 65, 0.3);
+    }
+    
+    .service-card:hover::before {
+      opacity: 1;
+    }
+    
+    .service-icon {
+      width: 64px;
+      height: 64px;
+      background: rgba(0, 255, 65, 0.1);
+      border: 2px solid var(--accent-border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      color: var(--accent-primary);
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+    
+    .service-icon svg {
+      width: 28px;
+      height: 28px;
+      display: block;
+      vertical-align: middle;
+    }
+    
+    .service-card:hover .service-icon {
+      background: rgba(0, 255, 65, 0.2);
+      border-color: var(--accent-primary);
+      transform: rotate(5deg) scale(1.1);
+      box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+    }
+    
+    .service-card h3 {
+      color: var(--text-hero);
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 12px 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    
+    .service-card h3::before {
+      content: "> ";
+      color: var(--accent-primary);
+    }
+    
+    .service-card p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.7;
+      margin: 0;
+    }
+    
+    @media (max-width: 768px) {
+      .services-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .service-card {
+        padding: 20px;
+      }
+      
+      .service-icon {
+        width: 56px;
+        height: 56px;
+      }
     }
     /* QR Code Button */
     .qr-button {
@@ -617,18 +831,131 @@
       </div>
       
       <h2>What We Do</h2>
-      <p>Our services span a wide range of technical disciplines:</p>
-      <ul style="margin-left: 20px; margin-top: 12px;">
-        <li>Full-stack web development</li>
-        <li>Backend development and API design</li>
-        <li>Hardware prototyping and development</li>
-        <li>3D printing and 3D modeling</li>
-        <li>Electronics prototyping</li>
-        <li>Logo and graphic design</li>
-        <li>2D and 3D animation</li>
-        <li>Custom social media and email templates</li>
-        <li>Software training and consulting</li>
-      </ul>
+      <p>Our services span a wide range of technical disciplines. Each service is tailored to meet your specific needs:</p>
+      
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+          <h3>Full-Stack Web Development</h3>
+          <p>Complete web solutions from frontend to backend. We build responsive, modern websites and web applications using the latest technologies. From simple landing pages to complex e-commerce platforms, we handle everything from design to deployment.</p>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+            </svg>
+          </div>
+          <h3>Backend Development & API Design</h3>
+          <p>Robust server-side solutions and RESTful APIs. We design scalable architectures, implement secure authentication systems, and create efficient database structures. Perfect for applications that need reliable data processing and integration capabilities.</p>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21v-4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v4"></path>
+              <path d="M7 3v4"></path>
+              <path d="M17 3v4"></path>
+              <path d="M7 7h10"></path>
+              <path d="M7 11h10"></path>
+              <path d="M7 15h4"></path>
+            </svg>
+          </div>
+          <h3>Hardware Prototyping & Development</h3>
+          <p>Turn your hardware ideas into reality. From initial concept to working prototype, we handle PCB design, component selection, firmware development, and testing. Ideal for IoT devices, embedded systems, and custom electronics projects.</p>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+          </div>
+          <h3>3D Printing & 3D Modeling</h3>
+          <p>Professional 3D design and printing services. We create detailed 3D models for prototypes, custom parts, and artistic projects. Our expertise includes CAD modeling, STL optimization, and managing the entire 3D printing workflow from design to finished product.</p>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+              <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+              <line x1="6" y1="6" x2="6.01" y2="6"></line>
+              <line x1="6" y1="18" x2="6.01" y2="18"></line>
+              <path d="M18 6h-4"></path>
+              <path d="M18 18h-4"></path>
+            </svg>
+          </div>
+          <h3>Electronics Prototyping</h3>
+          <p>Rapid prototyping for electronic systems. We design circuits, create breadboard prototypes, develop custom PCBs, and program microcontrollers. Whether you need sensors, actuators, or complete embedded systems, we bring your electronic concepts to life.</p>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <path d="M12 22V12"></path>
+              <path d="M12 12L8.04 9.96"></path>
+              <path d="M12 12L15.96 9.96"></path>
+            </svg>
+          </div>
+          <h3>Logo & Graphic Design</h3>
+          <p>Professional branding and visual identity design. We create memorable logos, brand guidelines, and marketing materials. Our designs are optimized for both digital and print use, ensuring your brand looks great everywhere it appears.</p>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <polygon points="22 3 12 8 2 3"></polygon>
+              <polygon points="22 21 12 16 2 21"></polygon>
+              <line x1="2" y1="3" x2="12" y2="8"></line>
+              <line x1="2" y1="21" x2="12" y2="16"></line>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+            </svg>
+          </div>
+          <h3>2D & 3D Animation</h3>
+          <p>Engaging animations for marketing, presentations, and entertainment. We create smooth 2D animations for explainer videos and social media content, as well as professional 3D animations for product showcases and visualizations.</p>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="3" y1="15" x2="21" y2="15"></line>
+              <line x1="15" y1="3" x2="15" y2="21"></line>
+            </svg>
+          </div>
+          <h3>Custom Templates</h3>
+          <p>Professional social media and email templates designed to match your brand. We create responsive email templates that work across all clients, and social media templates optimized for each platform's specifications.</p>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <h3>Software Training & Consulting</h3>
+          <p>Expert guidance to help your team master new technologies. We provide one-on-one training sessions, team workshops, and ongoing consulting to help you make the most of your software tools and development processes.</p>
+        </div>
+      </div>
       
       <h2>Our Approach</h2>
       <p>We focus on delivering high-quality solutions at affordable prices. With up to 95% savings on website costs compared to traditional agencies, and zero recurring or hidden fees, we make professional technical services accessible to businesses of all sizes.</p>
