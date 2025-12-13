@@ -199,19 +199,211 @@
       box-shadow: 0 0 8px var(--accent-primary);
     }
     
+    /* Hamburger Menu Button */
+    .navbar-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 8px;
+      margin-left: auto;
+      z-index: 61;
+      transition: color 0.3s ease;
+    }
+    
+    .navbar-toggle:hover {
+      color: var(--text-hero);
+    }
+    
+    .navbar-toggle svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2;
+    }
+    
+    /* Mobile Menu Modal */
+    .mobile-menu-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: transparent;
+      z-index: 99999;
+      pointer-events: none;
+    }
+    
+    .mobile-menu-overlay.show {
+      display: block;
+      pointer-events: auto;
+    }
+    
+    .mobile-menu-container {
+      position: fixed;
+      left: 0;
+      right: 0;
+      z-index: 100000;
+      pointer-events: none;
+    }
+    
+    .mobile-menu-card {
+      background: var(--bg-form);
+      border-bottom: 2px solid var(--accent-border);
+      border-radius: 0 0 16px 16px;
+      padding: 20px;
+      width: 100%;
+      max-height: auto;
+      overflow-y: visible;
+      pointer-events: auto;
+      opacity: 0;
+      transform: translateY(-50px) scale(0.9) rotateX(-10deg);
+      transform-origin: top center;
+      filter: blur(4px);
+      box-shadow: 0 20px 60px rgba(0, 255, 65, 0.1);
+      transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  filter 0.4s ease,
+                  box-shadow 0.5s ease;
+    }
+    
+    .mobile-menu-overlay.show .mobile-menu-card {
+      opacity: 1;
+      transform: translateY(0) scale(1) rotateX(0deg);
+      filter: blur(0);
+      box-shadow: 0 20px 60px rgba(0, 255, 65, 0.4);
+    }
+    
+    .mobile-menu-overlay:not(.show) .mobile-menu-card {
+      opacity: 0;
+      transform: translateY(-50px) scale(0.9) rotateX(-10deg);
+      filter: blur(4px);
+      transition: opacity 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19),
+                  transform 0.35s cubic-bezier(0.55, 0.055, 0.675, 0.19),
+                  filter 0.3s ease,
+                  box-shadow 0.3s ease;
+    }
+    
+    .mobile-menu-header {
+      display: none;
+    }
+    
+    .mobile-menu-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .mobile-menu-link {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 12px;
+      padding: 16px 20px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      background: rgba(0, 255, 65, 0.25);
+      border: 1px solid rgba(0, 255, 65, 0.5);
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateX(-30px) scale(0.95);
+      animation: slideInFromLeft 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    
+    .mobile-menu-overlay.show .mobile-menu-link {
+      animation: slideInFromLeft 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    
+    .mobile-menu-overlay.show .mobile-menu-link:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+    
+    .mobile-menu-overlay.show .mobile-menu-link:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .mobile-menu-overlay.show .mobile-menu-link:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+    
+    .mobile-menu-overlay.show .mobile-menu-link:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes slideInFromLeft {
+      0% {
+        opacity: 0;
+        transform: translateX(-30px) scale(0.95);
+      }
+      60% {
+        transform: translateX(5px) scale(1.02);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+    
+    .mobile-menu-overlay:not(.show) .mobile-menu-link {
+      opacity: 0;
+      transform: translateX(-30px) scale(0.95);
+      transition: opacity 0.2s ease, transform 0.25s ease;
+    }
+    
+    .mobile-menu-link-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      color: var(--accent-primary);
+    }
+    
+    .mobile-menu-link:hover {
+      color: var(--text-hero);
+      background: var(--accent-dim);
+      border-color: var(--accent-border);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 255, 65, 0.2);
+    }
+    
+    .mobile-menu-link.active {
+      color: var(--text-hero);
+      background: var(--accent-dim);
+      border-color: var(--accent-primary);
+      border-width: 2px;
+    }
+    
+    .mobile-menu-link.active .mobile-menu-link-icon {
+      color: var(--accent-primary);
+    }
+    
+    /* Mobile Menu */
     @media (max-width: 768px) {
       .navbar {
-        padding: 10px 12px;
+        padding: 10px 16px;
+        justify-content: space-between;
+      }
+      
+      .navbar-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 100;
       }
       
       .navbar-container {
-        gap: 16px;
-        flex-wrap: wrap;
+        display: none;
       }
       
-      .navbar-link {
-        font-size: 12px;
-        padding: 6px 12px;
+      /* Adjust badge position on mobile */
+      .badge {
+        left: 16px;
+        top: 16px;
+        z-index: 100;
       }
     }
 
@@ -2492,13 +2684,58 @@
       <div class="label">Charlie Russo</div>
       <div class="bar"></div>
     </div>
-    <div class="navbar-container">
+    <button class="navbar-toggle" id="navbarToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+    <div class="navbar-container" id="navbarContainer">
       <a href="./?skipboot" class="navbar-link" data-page="home">Home</a>
       <a href="about/" class="navbar-link" data-page="about">About</a>
       <a href="our-work/" class="navbar-link" data-page="our-work">Our work</a>
       <a href="contact/" class="navbar-link" data-page="contact">Contact</a>
     </div>
   </nav>
+  
+  <!-- Mobile Menu Modal -->
+  <div class="mobile-menu-overlay" id="mobileMenuOverlay">
+    <div class="mobile-menu-container">
+      <div class="mobile-menu-card">
+        <div class="mobile-menu-links">
+          <a href="./?skipboot" class="mobile-menu-link" data-page="home">
+            <svg class="mobile-menu-link-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <span>Home</span>
+          </a>
+          <a href="about/" class="mobile-menu-link" data-page="about">
+            <svg class="mobile-menu-link-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>About</span>
+          </a>
+          <a href="our-work/" class="mobile-menu-link" data-page="our-work">
+            <svg class="mobile-menu-link-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            <span>Our work</span>
+          </a>
+          <a href="contact/" class="mobile-menu-link" data-page="contact">
+            <svg class="mobile-menu-link-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            <span>Contact</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Boot overlay -->
   <div id="boot" aria-live="polite">
@@ -3034,6 +3271,82 @@
   <script>
     // ===== Utilities =====
     const $ = (sel) => document.querySelector(sel);
+
+    // ===== Mobile Navbar Toggle =====
+    (function initNavbar() {
+      const navbarToggle = $('#navbarToggle');
+      const mobileMenuOverlay = $('#mobileMenuOverlay');
+      const mobileMenuContainer = mobileMenuOverlay ? mobileMenuOverlay.querySelector('.mobile-menu-container') : null;
+      const navbar = document.querySelector('.navbar');
+      
+      // Position menu below navbar
+      function updateMenuPosition() {
+        if (mobileMenuContainer && navbar) {
+          const navbarHeight = navbar.offsetHeight;
+          mobileMenuContainer.style.top = navbarHeight + 'px';
+        }
+      }
+      
+      // Update position on load and resize
+      updateMenuPosition();
+      window.addEventListener('resize', updateMenuPosition);
+      
+      function openMenu() {
+        if (mobileMenuOverlay) {
+          updateMenuPosition();
+          mobileMenuOverlay.classList.add('show');
+          if (navbarToggle) {
+            navbarToggle.setAttribute('aria-expanded', 'true');
+          }
+        }
+      }
+      
+      function closeMenu() {
+        if (mobileMenuOverlay) {
+          mobileMenuOverlay.classList.remove('show');
+          if (navbarToggle) {
+            navbarToggle.setAttribute('aria-expanded', 'false');
+          }
+        }
+      }
+      
+      if (navbarToggle) {
+        navbarToggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = mobileMenuOverlay && mobileMenuOverlay.classList.contains('show');
+          if (isOpen) {
+            closeMenu();
+          } else {
+            openMenu();
+          }
+        });
+      }
+      
+      // Close menu when clicking outside the menu card
+      if (mobileMenuOverlay) {
+        mobileMenuOverlay.addEventListener('click', (e) => {
+          const menuCard = mobileMenuOverlay.querySelector('.mobile-menu-card');
+          if (menuCard && !menuCard.contains(e.target) && e.target !== navbarToggle) {
+            closeMenu();
+          }
+        });
+        
+        // Close menu when clicking on a link
+        const mobileMenuLinks = mobileMenuOverlay.querySelectorAll('.mobile-menu-link');
+        mobileMenuLinks.forEach(link => {
+          link.addEventListener('click', () => {
+            setTimeout(closeMenu, 100);
+          });
+        });
+      }
+      
+      // Close menu on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mobileMenuOverlay && mobileMenuOverlay.classList.contains('show')) {
+          closeMenu();
+        }
+      });
+    })();
 
     // ===== Matrix Canvas =====
     (function matrix() {
