@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Setting Up Your Site | Technical Consulting by Charles Russo</title>
+  <meta name="description"
+    content="Complete guide to setting up your website with a custom domain and GitHub Pages hosting." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="../media/charlie.jpg" type="image/jpeg" />
+  <script src="https://unpkg.com/qr-code-styling@1.9.2/lib/qr-code-styling.js"></script>
+  <style>
+    :root {
+      --bg-primary: #000;
+      --bg-card: rgba(0, 0, 0, 0.72);
+      --bg-form: rgba(0, 0, 0, 0.85);
+      --text-primary: #d7ffe1;
+      --text-secondary: #a9f5b3;
+      --text-muted: rgb(132, 255, 176);
+      --text-hero: #84ffb0;
+      --accent-primary: #00ff41;
+      --accent-secondary: #18ff66;
+      --accent-dim: rgba(0, 255, 65, 0.18);
+      --accent-border: rgba(0, 255, 65, 0.25);
+      --accent-shadow: rgba(0, 255, 65, 0.3);
+      --border-primary: rgba(0, 255, 65, 0.18);
+      --border-form: #00ff41;
+      --shadow-glow: 0 0 20px rgba(0, 255, 65, 0.4);
+      --shadow-form: 0 20px 60px rgba(0, 255, 65, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      overflow-x: hidden;
+    }
+
+    body {
+      padding: 20px;
+      padding-top: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    #matrixCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      display: block;
+      z-index: 0;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--accent-border);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .navbar-container {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      max-width: 1200px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .navbar-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .navbar-link:hover {
+      color: var(--text-hero);
+      background: var(--accent-dim);
+    }
+
+    .navbar-link.active {
+      color: var(--text-hero);
+      background: var(--accent-dim);
+    }
+
+    .navbar-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-primary);
+    }
+
+    /* Hamburger Menu Button */
+    .navbar-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 8px;
+      margin-left: auto;
+      z-index: 61;
+      transition: color 0.3s ease;
+    }
+
+    .navbar-toggle:hover {
+      color: var(--text-hero);
+    }
+
+    .navbar-toggle svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2;
+    }
+
+    /* Mobile Menu Modal */
+    .mobile-menu-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: transparent;
+      z-index: 99999;
+      pointer-events: none;
+    }
+
+    .mobile-menu-overlay.show {
+      display: block;
+      pointer-events: auto;
+    }
+
+    .mobile-menu-container {
+      position: fixed;
+      left: 0;
+      right: 0;
+      z-index: 100000;
+      pointer-events: none;
+    }
+
+    .mobile-menu-card {
+      background: var(--bg-form);
+      border-bottom: 2px solid var(--accent-border);
+      border-radius: 0 0 16px 16px;
+      padding: 20px;
+      width: 100%;
+      max-height: auto;
+      overflow-y: visible;
+      pointer-events: auto;
+      opacity: 0;
+      transform: translateY(-50px) scale(0.9) rotateX(-10deg);
+      transform-origin: top center;
+      filter: blur(4px);
+      box-shadow: 0 20px 60px rgba(0, 255, 65, 0.1);
+      transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+        filter 0.4s ease,
+        box-shadow 0.5s ease;
+    }
+
+    .mobile-menu-overlay.show .mobile-menu-card {
+      opacity: 1;
+      transform: translateY(0) scale(1) rotateX(0deg);
+      filter: blur(0);
+      box-shadow: 0 20px 60px rgba(0, 255, 65, 0.4);
+    }
+
+    .mobile-menu-overlay:not(.show) .mobile-menu-card {
+      opacity: 0;
+      transform: translateY(-50px) scale(0.9) rotateX(-10deg);
+      filter: blur(4px);
+      transition: opacity 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19),
+        transform 0.35s cubic-bezier(0.55, 0.055, 0.675, 0.19),
+        filter 0.3s ease,
+        box-shadow 0.3s ease;
+    }
+
+    .mobile-menu-header {
+      display: none;
+    }
+
+    .mobile-menu-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mobile-menu-link {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 12px;
+      padding: 16px 20px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      background: rgba(0, 255, 65, 0.25);
+      border: 1px solid rgba(0, 255, 65, 0.5);
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateX(-30px) scale(0.95);
+      animation: slideInFromLeft 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .mobile-menu-overlay.show .mobile-menu-link {
+      animation: slideInFromLeft 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .mobile-menu-overlay.show .mobile-menu-link:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .mobile-menu-overlay.show .mobile-menu-link:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .mobile-menu-overlay.show .mobile-menu-link:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .mobile-menu-overlay.show .mobile-menu-link:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes slideInFromLeft {
+      0% {
+        opacity: 0;
+        transform: translateX(-30px) scale(0.95);
+      }
+
+      60% {
+        transform: translateX(5px) scale(1.02);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+
+    .mobile-menu-overlay:not(.show) .mobile-menu-link {
+      opacity: 0;
+      transform: translateX(-30px) scale(0.95);
+      transition: opacity 0.2s ease, transform 0.25s ease;
+    }
+
+    .mobile-menu-link-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      color: var(--accent-primary);
+    }
+
+    .mobile-menu-link:hover {
+      color: var(--text-hero);
+      background: var(--accent-dim);
+      border-color: var(--accent-border);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 255, 65, 0.2);
+    }
+
+    .mobile-menu-link.active {
+      color: var(--text-hero);
+      background: var(--accent-dim);
+      border-color: var(--accent-primary);
+      border-width: 2px;
+    }
+
+    .mobile-menu-link.active .mobile-menu-link-icon {
+      color: var(--accent-primary);
+    }
+
+    /* Mobile Menu */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 10px 16px;
+        justify-content: space-between;
+      }
+
+      .navbar-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 100;
+      }
+
+      .navbar-container {
+        display: none;
+      }
+
+      /* Adjust badge position on mobile */
+      .badge {
+        left: 16px;
+        top: 16px;
+        z-index: 100;
+      }
+    }
+
+    /* Top label - now inside navbar */
+    .badge {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      z-index: 60;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .badge .label {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      letter-spacing: .22em;
+      color: var(--text-secondary);
+      opacity: .9;
+    }
+
+    .badge .bar {
+      height: 4px;
+      width: 88px;
+      border-radius: 999px;
+      background: var(--accent-secondary);
+      margin-top: 6px;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: .35
+      }
+
+      50% {
+        opacity: 1
+      }
+    }
+
+    .container {
+      width: min(900px, 100%);
+      max-width: 100%;
+      background: var(--bg-form);
+      border: 2px solid var(--border-form);
+      border-radius: 12px;
+      padding: clamp(24px, 4vw, 48px);
+      box-shadow: var(--shadow-form);
+      margin-top: 20px;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+      animation: fadeInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .header {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--accent-border);
+      text-align: center;
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: fadeInDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
+    }
+
+    @keyframes fadeInDown {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      color: var(--text-hero);
+      font-size: clamp(28px, 5vw, 40px);
+      margin: 0 0 10px 0;
+      font-weight: 700;
+      text-shadow: var(--shadow-glow);
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: clamp(14px, 2.5vw, 16px);
+      margin: 0;
+      opacity: 0.9;
+    }
+
+    .content {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .section {
+      margin-bottom: 48px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUpStagger 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .section:nth-of-type(1) {
+      animation-delay: 0.4s;
+    }
+
+    .section:nth-of-type(2) {
+      animation-delay: 0.6s;
+    }
+
+    .section:nth-of-type(3) {
+      animation-delay: 0.8s;
+    }
+
+    @keyframes fadeInUpStagger {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .content h2 {
+      color: var(--text-primary);
+      font-size: 24px;
+      margin: 0 0 20px 0;
+      font-weight: 700;
+      text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+    }
+
+    .content h2:before {
+      content: "> ";
+      color: var(--accent-primary);
+    }
+
+    .content h3 {
+      color: var(--text-hero);
+      font-size: 18px;
+      margin: 32px 0 16px 0;
+      font-weight: 600;
+    }
+
+    .content h3:before {
+      content: ">> ";
+      color: var(--accent-secondary);
+      font-size: 14px;
+    }
+
+    .content p {
+      margin: 0 0 16px 0;
+      color: var(--text-secondary);
+    }
+
+    .content a {
+      color: var(--text-hero);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent-border);
+      transition: all 0.3s ease;
+    }
+
+    .content a:hover {
+      color: var(--accent-primary);
+      border-bottom-color: var(--accent-primary);
+    }
+
+    .content ol {
+      margin: 16px 0;
+      padding-left: 24px;
+      counter-reset: step-counter;
+      list-style: none;
+    }
+
+    .content ol li {
+      margin-bottom: 16px;
+      padding-left: 12px;
+      position: relative;
+      counter-increment: step-counter;
+    }
+
+    .content ol li:before {
+      content: counter(step-counter) ".";
+      color: var(--accent-primary);
+      font-weight: 700;
+      position: absolute;
+      left: -24px;
+    }
+
+    .content ul {
+      margin: 16px 0;
+      padding-left: 24px;
+    }
+
+    .content ul li {
+      margin-bottom: 12px;
+      padding-left: 8px;
+    }
+
+    .content ul li:before {
+      content: "•";
+      color: var(--accent-primary);
+      font-weight: 700;
+      margin-right: 8px;
+      margin-left: -16px;
+    }
+
+    code {
+      background: rgba(0, 255, 65, 0.1);
+      border: 1px solid var(--accent-border);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      color: var(--accent-primary);
+    }
+
+    .code-block {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--accent-border);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .code-block code {
+      background: none;
+      border: none;
+      padding: 0;
+      display: block;
+    }
+
+    .provider-card {
+      background: rgba(0, 255, 65, 0.05);
+      border: 1px solid var(--accent-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 24px 0;
+    }
+
+    .provider-card h4 {
+      color: var(--accent-primary);
+      font-size: 16px;
+      margin: 0 0 16px 0;
+      font-weight: 700;
+    }
+
+    .note {
+      background: rgba(0, 255, 65, 0.08);
+      border-left: 3px solid var(--accent-primary);
+      padding: 12px 16px;
+      margin: 16px 0;
+      border-radius: 4px;
+    }
+
+    .note strong {
+      color: var(--accent-primary);
+    }
+
+    /* QR Code Button */
+    .qr-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 2px solid var(--accent-border);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 100;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .qr-button:hover {
+      transform: scale(1.1);
+      background: rgba(0, 255, 65, 0.2);
+      box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+    }
+
+    /* QR Code Modal */
+    .qr-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(3px);
+      display: none;
+      place-items: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .qr-modal.show {
+      display: grid;
+      opacity: 1;
+    }
+
+    .qr-container {
+      background: var(--bg-card);
+      border: 2px solid var(--accent-border);
+      border-radius: 12px;
+      padding: 24px;
+      position: relative;
+      text-align: center;
+      max-width: 90%;
+      width: 360px;
+      transform: scale(0.95);
+      opacity: 0;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .qr-modal.show .qr-container {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .qr-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 30px;
+      height: 30px;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.3s ease;
+    }
+
+    .qr-close:hover {
+      color: var(--text-primary);
+    }
+
+    .qr-container h3 {
+      color: var(--text-primary);
+      font-size: 20px;
+      margin: 0 0 24px 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .qr-container p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin: 24px 0 0 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    #qrCode {
+      background: #00ff4147;
+      padding: 16px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 280px;
+    }
+
+    #qrCode svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    #qrCode svg rect,
+    #qrCode svg path,
+    #qrCode svg circle,
+    #qrCode svg polygon {
+      opacity: 0;
+      animation: sectionFadeOpacity 0.5s ease-in-out forwards, var(--qr-blink-animation, none);
+    }
+
+    @keyframes sectionFadeOpacity {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes dotBlink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+        padding-top: 70px;
+      }
+
+      .container {
+        padding: 20px;
+        margin-top: 10px;
+      }
+
+      .content {
+        font-size: 14px;
+      }
+
+      .qr-button {
+        bottom: 16px;
+        right: 16px;
+        width: 44px;
+        height: 44px;
+      }
+    }
+
+    /* Footer Widget */
+    .footer-widget {
+      width: min(960px, 100%);
+      max-width: 960px;
+      margin: 32px auto 0;
+      padding: 20px clamp(12px, 3vw, 28px) 0;
+      border-top: 1px solid var(--border-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 2;
+    }
+
+    .footer-copyright {
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      opacity: 0.9;
+    }
+
+    .footer-link-btn {
+      background: rgba(0, 255, 65, 0.05);
+      border: 1px solid var(--border-primary);
+      color: var(--text-secondary);
+      font-size: 10px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .footer-link-btn:hover {
+      background: var(--accent-dim);
+      border-color: var(--accent-border);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px var(--accent-dim);
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      .footer-widget {
+        margin-top: 20px;
+        padding-top: 16px;
+        gap: 12px;
+      }
+
+      .footer-copyright {
+        font-size: 10px;
+        width: 100%;
+        text-align: center;
+      }
+
+      .footer-link-btn {
+        font-size: 9px;
+        padding: 5px 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="matrixCanvas"></canvas>
+
+  <!-- Navbar -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <!-- Static label -->
+    <div class="badge" aria-hidden="true">
+      <div class="label">Charlie Russo</div>
+      <div class="bar"></div>
+    </div>
+    <button class="navbar-toggle" id="navbarToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+    <div class="navbar-container" id="navbarContainer">
+      <a href="../?skipboot" class="navbar-link" data-page="home">Home</a>
+      <a href="../about/" class="navbar-link" data-page="about">About</a>
+      <a href="../our-work/" class="navbar-link" data-page="our-work">Our work</a>
+      <a href="../contact/" class="navbar-link" data-page="contact">Contact</a>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu Modal -->
+  <div class="mobile-menu-overlay" id="mobileMenuOverlay">
+    <div class="mobile-menu-container">
+      <div class="mobile-menu-card">
+        <div class="mobile-menu-links">
+          <a href="../?skipboot" class="mobile-menu-link" data-page="home">
+            <svg class="mobile-menu-link-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <span>Home</span>
+          </a>
+          <a href="../about/" class="mobile-menu-link" data-page="about">
+            <svg class="mobile-menu-link-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>About</span>
+          </a>
+          <a href="../our-work/" class="mobile-menu-link" data-page="our-work">
+            <svg class="mobile-menu-link-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            <span>Our work</span>
+          </a>
+          <a href="../contact/" class="mobile-menu-link" data-page="contact">
+            <svg class="mobile-menu-link-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            <span>Contact</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1>Setting Up Your Site</h1>
+      <p class="subtitle">A complete guide to launching your website with a custom domain</p>
+    </div>
+
+    <div class="content">
+      <!-- Section 1: Where to Get Your Domain -->
+      <div class="section">
+        <h2>Where to Get Your Domain</h2>
+        <p>A domain name is your website's address on the internet (like <code>yourname.com</code>). Here is the best
+          option for purchasing a domain:</p>
+
+        <div class="provider-card">
+          <h4>Porkbun</h4>
+          <p><a href="https://porkbun.com" target="_blank" rel="noopener noreferrer">Porkbun.com</a> is a popular choice
+            for domain registration, known for:</p>
+          <ul>
+            <li>Competitive pricing with transparent fees</li>
+            <li>Free WHOIS privacy protection</li>
+            <li>Clean, user-friendly interface</li>
+            <li>Excellent customer support</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Section 2: Where to Host Your Website Code -->
+      <div class="section">
+        <h2>Where to Host Your Website Code</h2>
+        <p><a href="https://pages.github.com" target="_blank" rel="noopener noreferrer">GitHub Pages</a> is a free
+          hosting service that's perfect for static websites. It's reliable, fast, and integrates seamlessly with Git
+          version control.</p>
+
+        <h3>Step-by-Step Guide to Setting Up GitHub Pages</h3>
+
+        <ol>
+          <li>
+            <strong>Create a GitHub Account</strong><br>
+            Visit <a href="https://github.com/signup" target="_blank" rel="noopener noreferrer">github.com/signup</a>
+            and create a free account if you don't already have one.
+          </li>
+
+          <li>
+            <strong>Create a New Repository</strong><br>
+            Once logged in, click the <code>+</code> icon in the top-right corner and select "New repository".
+          </li>
+
+          <li>
+            <strong>Name Your Repository</strong><br>
+            For a personal website, name it <code>username.github.io</code> (replace "username" with your actual GitHub
+            username). This special naming convention will make your site available at that URL automatically.
+            <div class="note">
+              <strong>Example:</strong> If your username is "johndoe", name the repository
+              <code>johndoe.github.io</code>
+            </div>
+          </li>
+
+          <li>
+            <strong>Initialize the Repository</strong><br>
+            Make sure the repository is set to "Public" and optionally check "Add a README file". Click "Create
+            repository".
+          </li>
+
+          <li>
+            <strong>Upload Your Website Files</strong><br>
+            You can upload files in several ways:
+            <ul>
+              <li><strong>Via Web Interface:</strong> Click "Add file" → "Upload files" and drag your HTML, CSS, and
+                other files</li>
+              <li><strong>Via Git:</strong> Clone the repository to your computer, add your files, commit, and push</li>
+            </ul>
+            Make sure your main HTML file is named <code>index.html</code> in the root directory.
+          </li>
+
+          <li>
+            <strong>Enable GitHub Pages</strong><br>
+            Go to your repository's Settings → Pages (in the left sidebar). Under "Source", select the <code>main</code>
+            branch and click "Save".
+          </li>
+
+          <li>
+            <strong>Access Your Live Site</strong><br>
+            After a few minutes, your site will be live at <code>https://username.github.io</code>. GitHub will show you
+            the URL in the Pages settings.
+          </li>
+        </ol>
+
+        <div class="note">
+          <strong>Pro Tip:</strong> GitHub Pages automatically rebuilds your site whenever you push changes to your
+          repository. This makes updates incredibly easy!
+        </div>
+      </div>
+
+      <!-- Section 3: How to Connect Your Domain -->
+      <div class="section">
+        <h2>How to Connect Your Domain to GitHub Pages</h2>
+        <p>Once you have your domain and GitHub Pages site set up, you need to connect them.</p>
+
+        <div class="provider-card">
+          <h4>Connecting with Porkbun</h4>
+
+          <ol>
+            <li>
+              <strong>Log in to Porkbun</strong><br>
+              Go to <a href="https://porkbun.com/account/domainsSpeedy" target="_blank" rel="noopener noreferrer">your
+                Porkbun account</a> and click on the domain you want to connect.
+            </li>
+
+            <li>
+              <strong>Access DNS Settings</strong><br>
+              Click on "DNS" in the domain management menu.
+            </li>
+
+            <li>
+              <strong>Add A Records</strong><br>
+              Add the following four A records (these point to GitHub's servers):
+              <div class="code-block">
+                <code>Type: A    Host: @    Answer: 185.199.108.153
+Type: A    Host: @    Answer: 185.199.109.153
+Type: A    Host: @    Answer: 185.199.110.153
+Type: A    Host: @    Answer: 185.199.111.153</code>
+              </div>
+            </li>
+
+            <li>
+              <strong>Add CNAME Record</strong><br>
+              Add a CNAME record for the www subdomain:
+              <div class="code-block">
+                <code>Type: CNAME    Host: www    Answer: username.github.io</code>
+              </div>
+              Replace "username" with your GitHub username.
+            </li>
+
+            <li>
+              <strong>Configure GitHub Pages</strong><br>
+              Go back to your GitHub repository → Settings → Pages. Under "Custom domain", enter your domain (e.g.,
+              <code>yourdomain.com</code>) and click "Save".
+            </li>
+
+            <li>
+              <strong>Enable HTTPS</strong><br>
+              Wait a few minutes for DNS to propagate, then check the "Enforce HTTPS" box in GitHub Pages settings.
+            </li>
+          </ol>
+        </div>
+
+        <div class="note">
+          <strong>Important:</strong> DNS changes can take anywhere from a few minutes to 48 hours to fully propagate
+          worldwide. Be patient! You can check the status using tools like <a href="https://www.whatsmydns.net"
+            target="_blank" rel="noopener noreferrer">whatsmydns.net</a>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Widget -->
+  <div class="footer-widget">
+    <span class="footer-copyright">© Charles Russo</span>
+    <a href="../privacy-policy/" class="footer-link-btn">Privacy Policy</a>
+    <a href="../terms/" class="footer-link-btn">Terms of Service</a>
+  </div>
+
+  <!-- QR Code Button -->
+  <button id="qrButton" class="qr-button" aria-label="Show QR Code">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7"></rect>
+      <rect x="14" y="3" width="7" height="7"></rect>
+      <rect x="14" y="14" width="7" height="7"></rect>
+      <rect x="3" y="14" width="7" height="7"></rect>
+    </svg>
+  </button>
+
+  <!-- QR Code Modal -->
+  <div id="qrModal" class="qr-modal" aria-hidden="true">
+    <div class="qr-container">
+      <button type="button" class="qr-close" id="closeQrBtn" aria-label="Close QR Code">×</button>
+      <h3>Scan to Visit</h3>
+      <div id="qrCode">
+        <!-- Dynamic QR code will be generated here -->
+      </div>
+      <p id="qrDescription">Scan this QR code with your phone's camera to visit this page</p>
+    </div>
+  </div>
+
+  <script>
+    const $ = (sel) => document.querySelector(sel);
+
+    // ===== Mobile Navbar Toggle =====
+    (function initNavbar() {
+      const navbarToggle = $('#navbarToggle');
+      const mobileMenuOverlay = $('#mobileMenuOverlay');
+      const mobileMenuContainer = mobileMenuOverlay ? mobileMenuOverlay.querySelector('.mobile-menu-container') : null;
+      const navbar = document.querySelector('.navbar');
+
+      // Position menu below navbar
+      function updateMenuPosition() {
+        if (mobileMenuContainer && navbar) {
+          const navbarHeight = navbar.offsetHeight;
+          mobileMenuContainer.style.top = navbarHeight + 'px';
+        }
+      }
+
+      // Update position on load and resize
+      updateMenuPosition();
+      window.addEventListener('resize', updateMenuPosition);
+
+      function openMenu() {
+        if (mobileMenuOverlay) {
+          updateMenuPosition();
+          mobileMenuOverlay.classList.add('show');
+          if (navbarToggle) {
+            navbarToggle.setAttribute('aria-expanded', 'true');
+          }
+        }
+      }
+
+      function closeMenu() {
+        if (mobileMenuOverlay) {
+          mobileMenuOverlay.classList.remove('show');
+          if (navbarToggle) {
+            navbarToggle.setAttribute('aria-expanded', 'false');
+          }
+        }
+      }
+
+      if (navbarToggle) {
+        navbarToggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = mobileMenuOverlay && mobileMenuOverlay.classList.contains('show');
+          if (isOpen) {
+            closeMenu();
+          } else {
+            openMenu();
+          }
+        });
+      }
+
+      // Close menu when clicking outside the menu card
+      if (mobileMenuOverlay) {
+        mobileMenuOverlay.addEventListener('click', (e) => {
+          const menuCard = mobileMenuOverlay.querySelector('.mobile-menu-card');
+          if (menuCard && !menuCard.contains(e.target) && e.target !== navbarToggle) {
+            closeMenu();
+          }
+        });
+
+        // Close menu when clicking on a link
+        const mobileMenuLinks = mobileMenuOverlay.querySelectorAll('.mobile-menu-link');
+        mobileMenuLinks.forEach(link => {
+          link.addEventListener('click', () => {
+            setTimeout(closeMenu, 100);
+          });
+        });
+      }
+
+      // Close menu on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mobileMenuOverlay && mobileMenuOverlay.classList.contains('show')) {
+          closeMenu();
+        }
+      });
+    })();
+
+    // ===== Matrix Canvas =====
+    (function matrix() {
+      const canvas = document.getElementById("matrixCanvas");
+      const ctx = canvas.getContext("2d");
+      const FONT_FAMILY = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono','Courier New', monospace";
+      const BASE_FONT_SIZE = 18;
+      const TRAIL_FADE = 0.04;
+      const CHARS = ("アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン" +
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@$%#*-+=<>" +
+        "abcdefghijklmnopqrstuvwxyz").split("");
+
+      let width = 0, height = 0, dpr = 1, fontSize = BASE_FONT_SIZE, columns = 0, drops = [];
+      function resize() {
+        dpr = window.devicePixelRatio || 1;
+        width = canvas.clientWidth = window.innerWidth;
+        height = canvas.clientHeight = window.innerHeight;
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        fontSize = Math.max(14, Math.min(BASE_FONT_SIZE, Math.floor(width / 40)));
+        ctx.font = fontSize + "px " + FONT_FAMILY;
+        columns = Math.max(1, Math.floor(width / fontSize));
+        drops = new Array(columns).fill(1 + Math.floor(Math.random() * 50));
+      }
+      function frame() {
+        ctx.fillStyle = "rgba(0,0,0," + TRAIL_FADE + ")";
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = "#00ff4a";
+        ctx.textBaseline = "top";
+        for (let i = 0; i < columns; i++) {
+          const char = CHARS[(Math.random() * CHARS.length) | 0];
+          const x = i * fontSize;
+          const y = drops[i] * fontSize;
+          ctx.fillText(char, x, y);
+          if (y > height && Math.random() > 0.992) drops[i] = 0;
+          drops[i]++;
+        }
+        requestAnimationFrame(frame);
+      }
+      resize();
+      ctx.fillStyle = "#000"; ctx.fillRect(0, 0, width, height);
+      requestAnimationFrame(frame);
+      window.addEventListener("resize", () => { resize(); ctx.clearRect(0, 0, width, height); });
+    })();
+
+    // ===== QR Code functionality =====
+    const qrButton = $('#qrButton');
+    const qrModal = $('#qrModal');
+    const closeQrBtn = $('#closeQrBtn');
+    const qrCodeContainer = $('#qrCode');
+    const qrDescription = $('#qrDescription');
+    let qrCodeInstance = null;
+
+    function generateQRCode() {
+      const currentUrl = window.location.href;
+
+      if (qrCodeInstance) {
+        qrCodeInstance.clear();
+      }
+
+      qrCodeContainer.innerHTML = '';
+
+      const isMobile = window.innerWidth <= 480;
+      const qrSize = isMobile ? 240 : 280;
+
+      qrCodeInstance = new QRCodeStyling({
+        width: qrSize,
+        height: qrSize,
+        data: currentUrl,
+        margin: 6,
+        type: 'svg',
+        qrOptions: {
+          errorCorrectionLevel: 'Q'
+        },
+        backgroundOptions: {
+          color: 'transparent'
+        },
+        dotsOptions: {
+          type: 'dots',
+          color: '#00ff41'
+        },
+        cornersSquareOptions: {
+          type: 'extra-rounded',
+          color: '#00ff41'
+        },
+        cornersDotOptions: {
+          type: 'dot',
+          color: '#00ff41'
+        }
+      });
+
+      qrCodeInstance.append(qrCodeContainer);
+
+      setTimeout(() => {
+        const qrSvg = qrCodeContainer.querySelector('svg');
+        if (qrSvg) {
+          const rects = Array.from(qrSvg.querySelectorAll('rect'));
+          const paths = Array.from(qrSvg.querySelectorAll('path'));
+          const circles = Array.from(qrSvg.querySelectorAll('circle'));
+          const polygons = Array.from(qrSvg.querySelectorAll('polygon'));
+          const allElements = [...rects, ...paths, ...circles, ...polygons];
+
+          if (allElements.length > 0) {
+            const maxDelay = 0.6;
+            allElements.forEach((el) => {
+              const delay = Math.random() * maxDelay;
+              el.style.animationDelay = `${delay.toFixed(3)}s`;
+            });
+          }
+        }
+      }, 100);
+    }
+
+    function openQrModal() {
+      if (qrCodeContainer) {
+        qrCodeContainer.innerHTML = '';
+      }
+
+      generateQRCode();
+
+      qrModal.style.display = 'grid';
+      requestAnimationFrame(() => {
+        qrModal.classList.add('show');
+        qrModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      });
+    }
+
+    function closeQrModal() {
+      qrModal.classList.remove('show');
+      qrModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+
+      if (qrCodeInstance) {
+        qrCodeInstance = null;
+      }
+      if (qrCodeContainer) {
+        qrCodeContainer.innerHTML = '';
+      }
+
+      setTimeout(() => {
+        qrModal.style.display = 'none';
+      }, 300);
+    }
+
+    if (qrButton) qrButton.addEventListener('click', openQrModal);
+    if (closeQrBtn) closeQrBtn.addEventListener('click', closeQrModal);
+    if (qrModal) {
+      qrModal.addEventListener('click', (e) => {
+        if (e.target === qrModal) closeQrModal();
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (qrModal && qrModal.classList.contains('show')) {
+          closeQrModal();
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>
