@@ -4315,8 +4315,14 @@
         });
       }
 
+      // Track user intent for post-signup action
+      const INTENT_STORAGE_KEY = 'userIntent';
+      
       // Open modal
       function openModal() {
+        // Track that user clicked inquiry button
+        sessionStorage.setItem(INTENT_STORAGE_KEY, 'inquiry');
+        
         // Mark form as opened to prevent popup
         if (typeof window.markFormAsOpened === 'function') {
           window.markFormAsOpened();
@@ -5579,8 +5585,14 @@ Submitted: ${new Date().toLocaleString()}`
       const affiliateStep1 = $('#affiliateStep1');
       const affiliateStep2 = $('#affiliateStep2');
 
+      // Track user intent for post-signup action
+      const INTENT_STORAGE_KEY = 'userIntent';
+      
       // Open affiliate modal
       function openAffiliateModal() {
+        // Track that user clicked affiliate button
+        sessionStorage.setItem(INTENT_STORAGE_KEY, 'affiliate');
+        
         document.body.style.overflow = 'hidden';
         affiliateModal.setAttribute('aria-hidden', 'false');
         
@@ -5783,6 +5795,29 @@ Submitted: ${new Date().toLocaleString()}`
         // Log affiliate signup (for your tracking)
         console.log('🎯 New affiliate signup:', email);
         console.log('🔗 Generated affiliate link:', link);
+        
+        // Check user intent and open appropriate modal after signup
+        const userIntent = sessionStorage.getItem(INTENT_STORAGE_KEY);
+        if (userIntent === 'inquiry') {
+          // User originally wanted to fill out inquiry form
+          // Close affiliate modal and open inquiry form after a short delay
+          setTimeout(() => {
+            closeAffiliateModal();
+            // Trigger the inquiry form button click
+            const openFormBtn = $('#openFormBtn');
+            if (openFormBtn) {
+              setTimeout(() => {
+                openFormBtn.click();
+                // Clear intent after opening inquiry form
+                sessionStorage.removeItem(INTENT_STORAGE_KEY);
+              }, 500); // Small delay to allow affiliate modal to close
+            }
+          }, 1000); // Wait 1 second to show step 2 before transitioning
+        } else if (userIntent === 'affiliate') {
+          // User wanted affiliate dashboard - they're already there (step 2)
+          // No action needed, just clear the intent
+          sessionStorage.removeItem(INTENT_STORAGE_KEY);
+        }
       }
 
       // Email validation helper

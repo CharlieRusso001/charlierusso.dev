@@ -530,6 +530,7 @@
     .content ul {
       margin: 16px 0;
       padding-left: 24px;
+      list-style: none;
     }
 
     .content ul li {
@@ -950,11 +951,17 @@
             <strong>Create a GitHub Account</strong><br>
             Visit <a href="https://github.com/signup" target="_blank" rel="noopener noreferrer">github.com/signup</a>
             and create a free account if you don't already have one.
+            <div class="note">
+              <strong>Screenshot placeholder:</strong> Add image showing GitHub signup page
+            </div>
           </li>
 
           <li>
             <strong>Create a New Repository</strong><br>
             Once logged in, click the <code>+</code> icon in the top-right corner and select "New repository".
+            <div class="note">
+              <strong>Screenshot placeholder:</strong> Add image showing the + icon and New repository option
+            </div>
           </li>
 
           <li>
@@ -965,12 +972,18 @@
               <strong>Example:</strong> If your username is "johndoe", name the repository
               <code>johndoe.github.io</code>
             </div>
+            <div class="note">
+              <strong>Screenshot placeholder:</strong> Add image showing repository name field
+            </div>
           </li>
 
           <li>
             <strong>Initialize the Repository</strong><br>
             Make sure the repository is set to "Public" and optionally check "Add a README file". Click "Create
             repository".
+            <div class="note">
+              <strong>Screenshot placeholder:</strong> Add image showing Public option and Create repository button
+            </div>
           </li>
 
           <li>
@@ -982,18 +995,27 @@
               <li><strong>Via Git:</strong> Clone the repository to your computer, add your files, commit, and push</li>
             </ul>
             Make sure your main HTML file is named <code>index.html</code> in the root directory.
+            <div class="note">
+              <strong>Screenshot placeholder:</strong> Add image showing Add file → Upload files option
+            </div>
           </li>
 
           <li>
             <strong>Enable GitHub Pages</strong><br>
             Go to your repository's Settings → Pages (in the left sidebar). Under "Source", select the <code>main</code>
             branch and click "Save".
+            <div class="note">
+              <strong>Screenshot placeholder:</strong> Add image showing Settings → Pages and Source selection
+            </div>
           </li>
 
           <li>
             <strong>Access Your Live Site</strong><br>
             After a few minutes, your site will be live at <code>https://username.github.io</code>. GitHub will show you
             the URL in the Pages settings.
+            <div class="note">
+              <strong>Screenshot placeholder:</strong> Add image showing the live site URL in Pages settings
+            </div>
           </li>
         </ol>
 
@@ -1016,11 +1038,17 @@
               <strong>Log in to Porkbun</strong><br>
               Go to <a href="https://porkbun.com/account/domainsSpeedy" target="_blank" rel="noopener noreferrer">your
                 Porkbun account</a> and click on the domain you want to connect.
+              <div class="note">
+                <strong>Screenshot placeholder:</strong> Add image showing Porkbun domain list
+              </div>
             </li>
 
             <li>
               <strong>Access DNS Settings</strong><br>
               Click on "DNS" in the domain management menu.
+              <div class="note">
+                <strong>Screenshot placeholder:</strong> Add image showing DNS menu option
+              </div>
             </li>
 
             <li>
@@ -1032,6 +1060,9 @@ Type: A    Host: @    Answer: 185.199.109.153
 Type: A    Host: @    Answer: 185.199.110.153
 Type: A    Host: @    Answer: 185.199.111.153</code>
               </div>
+              <div class="note">
+                <strong>Screenshot placeholder:</strong> Add image showing A record configuration
+              </div>
             </li>
 
             <li>
@@ -1041,17 +1072,26 @@ Type: A    Host: @    Answer: 185.199.111.153</code>
                 <code>Type: CNAME    Host: www    Answer: username.github.io</code>
               </div>
               Replace "username" with your GitHub username.
+              <div class="note">
+                <strong>Screenshot placeholder:</strong> Add image showing CNAME record configuration
+              </div>
             </li>
 
             <li>
               <strong>Configure GitHub Pages</strong><br>
               Go back to your GitHub repository → Settings → Pages. Under "Custom domain", enter your domain (e.g.,
               <code>yourdomain.com</code>) and click "Save".
+              <div class="note">
+                <strong>Screenshot placeholder:</strong> Add image showing Custom domain field in GitHub Pages settings
+              </div>
             </li>
 
             <li>
               <strong>Enable HTTPS</strong><br>
               Wait a few minutes for DNS to propagate, then check the "Enforce HTTPS" box in GitHub Pages settings.
+              <div class="note">
+                <strong>Screenshot placeholder:</strong> Add image showing Enforce HTTPS checkbox
+              </div>
             </li>
           </ol>
         </div>
