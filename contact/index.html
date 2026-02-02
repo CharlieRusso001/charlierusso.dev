@@ -1608,14 +1608,107 @@
       const EMAILJS_CONFIG = {
         publicKey: 'koG6eWbBRll3MwQU9',
         serviceId: 'service_0r9aneq',
+        referralServiceId: 'service_3uom8fe',
         templateId: 'template_4uw5t74',
-        referralServiceId: 'service_0r9aneq',
-        referralTemplateId: 'template_4uw5t74'
+        referralTemplateId: 'template_0gw81ok'
       };
       
       // Initialize EmailJS if available
       if (typeof emailjs !== 'undefined') {
         emailjs.init(EMAILJS_CONFIG.publicKey);
+      }
+      
+      // ===== Referral System =====
+      const REFERRAL_COOKIE_NAME = 'techHelpReferrer';
+      const REFERRAL_COOKIE_EXPIRY_DAYS = 30;
+      
+      function handleReferralTracking() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const referrerEmail = urlParams.get('ref');
+        
+        if (referrerEmail && isValidEmail(referrerEmail)) {
+          console.log('🎯 Referrer tracked from URL:', referrerEmail);
+        }
+      }
+      
+      function getReferrer() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const referrer = urlParams.get('ref');
+        return referrer && isValidEmail(referrer) ? referrer : null;
+      }
+      
+      function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      }
+      
+      handleReferralTracking();
+      
+      // Cookie utilities
+      const COOKIE_NAME = 'techHelpFormData';
+      const COOKIE_EXPIRY_DAYS = 7;
+      
+      function setCookie(name, value, days) {
+        const expires = new Date();
+        expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+        document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/`;
+      }
+      
+      function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+          let c = ca[i];
+          while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+          if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+        }
+        return null;
+      }
+      
+      function deleteCookie(name) {
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
+      }
+      
+      // Save form data to cookies
+      function saveFormData() {
+        const formData = new FormData(form);
+        const data = {};
+        for (let [key, value] of formData.entries()) {
+          if (value.trim()) data[key] = value;
+        }
+        if (Object.keys(data).length > 0) {
+          setCookie(COOKIE_NAME, JSON.stringify(data), COOKIE_EXPIRY_DAYS);
+        }
+      }
+      
+      // Load form data from cookies
+      function loadFormData() {
+        const savedData = getCookie(COOKIE_NAME);
+        if (savedData) {
+          try {
+            const data = JSON.parse(savedData);
+            Object.entries(data).forEach(([key, value]) => {
+              const field = form.querySelector(`[name="${key}"]`);
+              if (field) {
+                field.value = value;
+                if (key === 'phone' && field.id === 'phone') {
+                  field.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+              }
+            });
+          } catch (e) {
+            console.warn('Failed to load saved form data:', e);
+          }
+        }
+      }
+      
+      // Auto-save form data on input
+      function setupAutoSave() {
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+          input.addEventListener('input', saveFormData);
+          input.addEventListener('change', saveFormData);
+        });
       }
       
       const modal = $('#formModal');
@@ -1641,6 +1734,32 @@
         }
         document.body.style.overflow = 'hidden';
         modal.setAttribute('aria-hidden', 'false');
+        loadFormData();
+        
+        // Load saved country selection
+        setTimeout(() => {
+          const savedCountrySelection = getCookie('phoneCountrySelection');
+          if (savedCountrySelection) {
+            try {
+              const { code, dialCode } = JSON.parse(savedCountrySelection);
+              if (code && dialCode) {
+                const flagElement = $('#selectedFlag');
+                const codeElement = $('#selectedCode');
+                const countryCodeInput = $('#phoneCountryCode');
+                
+                if (flagElement && codeElement && countryCodeInput) {
+                  flagElement.src = `../media/flags/${code}.svg`;
+                  flagElement.alt = `${code.toUpperCase()} Flag`;
+                  codeElement.textContent = dialCode;
+                  countryCodeInput.value = dialCode;
+                }
+              }
+            } catch (e) {
+              console.warn('Failed to restore country selection:', e);
+            }
+          }
+        }, 100);
+        
         requestAnimationFrame(() => {
           modal.classList.add('show');
           setTimeout(() => {
@@ -1655,6 +1774,21 @@
       function closeModal() {
         modal.classList.remove('show');
         modal.setAttribute('aria-hidden', 'true');
+        
+        // Close country dropdown if open
+        const countryDropdownElement = $('#countryDropdown');
+        const countryDropdownBackdropElement = $('#countryDropdownBackdrop');
+        if (countryDropdownElement && countryDropdownElement.style.display === 'block') {
+          countryDropdownElement.style.display = 'none';
+          if (countryDropdownBackdropElement) {
+            countryDropdownBackdropElement.style.display = 'none';
+          }
+          const countrySelectorElement = $('#countrySelector');
+          if (countrySelectorElement) {
+            countrySelectorElement.classList.remove('open');
+          }
+        }
+        
         document.body.style.overflow = '';
         setTimeout(() => {
           resetForm();
@@ -1768,68 +1902,59 @@
         alert('Error: ' + message + '\n\nPlease try again or contact russoc2023@fau.edu directly.');
       }
       
-      async function submitForm(e) {
-        e.preventDefault();
-        if (!EMAILJS_CONFIG.publicKey || EMAILJS_CONFIG.publicKey === 'YOUR_PUBLIC_KEY') {
-          alert('EmailJS is not configured yet. Please provide your EmailJS credentials.');
-          return;
-        }
+      // Format form data for client email template
+      function formatFormData(formData) {
+        const budgetLabels = {
+          'medium': '100-500 USD',
+          'high': '500-1000 USD',
+          'very-high': '1000-2000 USD',
+          'critical': '2000+'
+        };
+        const categoryLabels = {
+          'web': 'Website Development',
+          'software': 'Backend Development',
+          '3d': '3D-Printing / 3D-Modeling',
+          'electronics': 'Electronics Prototyping',
+          'training': 'Software Training',
+          'logo': 'Logo Design',
+          'graphic': 'Graphic Design for Clothes',
+          'templates': 'Custom Social Media / Email Templates',
+          '2d-animation': '2D Animation',
+          '3d-animation': '3D Animation',
+          'other': 'Other'
+        };
         
-        showLoading();
+        const name = formData.get('name') || '';
+        const email = formData.get('email') || '';
+        const phoneNumber = formData.get('phone') || '';
+        const phoneCode = formData.get('phoneCountryCode') || '+1';
+        const phone = phoneNumber ? `${phoneCode} ${phoneNumber}` : 'Not provided';
+        const urgency = formData.get('urgency') || '';
+        const category = formData.get('category') || '';
+        const description = formData.get('description') || '';
+        const website = formData.get('device') || 'Not provided';
         
-        try {
-          const formData = new FormData(form);
-          const budgetLabels = {
-            'medium': '100-500 USD',
-            'high': '500-1000 USD',
-            'very-high': '1000-2000 USD',
-            'critical': '2000+'
-          };
-          const categoryLabels = {
-            'web': 'Website Development',
-            'software': 'Backend Development',
-            '3d': '3D-Printing / 3D-Modeling',
-            'electronics': 'Electronics Prototyping',
-            'training': 'Software Training',
-            'logo': 'Logo Design',
-            'graphic': 'Graphic Design for Clothes',
-            'templates': 'Custom Social Media / Email Templates',
-            '2d-animation': '2D Animation',
-            '3d-animation': '3D Animation',
-            'other': 'Other'
-          };
-          
-          const name = formData.get('name') || '';
-          const email = formData.get('email') || '';
-          const phoneNumber = formData.get('phone') || '';
-          const phoneCode = formData.get('phoneCountryCode') || '+1';
-          const phone = phoneNumber ? `${phoneCode} ${phoneNumber}` : 'Not provided';
-          const urgency = formData.get('urgency') || '';
-          const category = formData.get('category') || '';
-          const description = formData.get('description') || '';
-          const website = formData.get('device') || 'Not provided';
-          
-          const templateParams = {
-            to_name: 'Charlie Russo',
-            to_email: 'russoc2023@fau.edu',
-            from_name: name,
-            from_email: email,
-            reply_to: email,
-            name: name,
-            email: email,
-            phone: phone,
-            urgency: urgency,
-            category: category,
-            description: description,
-            device: website,
-            project_budget: budgetLabels[urgency] || urgency,
-            project_category: categoryLabels[category] || category,
-            project_description: description,
-            existing_website: website,
-            client_name: name,
-            client_email: email,
-            timestamp: new Date().toLocaleString(),
-            message: `NEW PROJECT INQUIRY
+        return {
+          to_name: 'Charlie Russo',
+          to_email: 'russoc2023@fau.edu',
+          from_name: name,
+          from_email: email,
+          reply_to: email,
+          name: name,
+          email: email,
+          phone: phone,
+          urgency: urgency,
+          category: category,
+          description: description,
+          device: website,
+          project_budget: budgetLabels[urgency] || urgency,
+          project_category: categoryLabels[category] || category,
+          project_description: description,
+          existing_website: website,
+          client_name: name,
+          client_email: email,
+          timestamp: new Date().toLocaleString(),
+          message: `NEW PROJECT INQUIRY
 
 Client: ${name}
 Email: ${email}
@@ -1843,23 +1968,82 @@ Project Description:
 ${description}
 
 Submitted: ${new Date().toLocaleString()}`
-          };
+        };
+      }
+      
+      // Format data for referral email template
+      function formatReferralData(formData, referrerEmail) {
+        const name = formData.get('name') || '';
+        const referrerName = referrerEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        
+        return {
+          to_name: referrerName,
+          to_email: referrerEmail,
+          from_name: 'Charlie Russo',
+          from_email: 'russoc2023@fau.edu',
+          reply_to: 'russoc2023@fau.edu',
+          email2: referrerEmail,
+          from_email2: referrerEmail,
+          from_name: name,
+          timestamp: new Date().toLocaleString()
+        };
+      }
+      
+      async function submitForm(e) {
+        e.preventDefault();
+        if (!EMAILJS_CONFIG.publicKey || EMAILJS_CONFIG.publicKey === 'YOUR_PUBLIC_KEY') {
+          alert('EmailJS is not configured yet. Please provide your EmailJS credentials.');
+          return;
+        }
+        
+        showLoading();
+        
+        try {
+          const formData = new FormData(form);
+          const clientTemplateParams = formatFormData(formData);
           
-          const response = await emailjs.send(
+          // Send client email
+          const clientResponse = await emailjs.send(
             EMAILJS_CONFIG.serviceId,
             EMAILJS_CONFIG.templateId,
-            templateParams,
+            clientTemplateParams,
             EMAILJS_CONFIG.publicKey
           );
           
-          if (response.status === 200 || response.text === 'OK') {
-            showSuccess();
-          } else {
-            throw new Error('Failed to send email. Status: ' + response.status);
+          if (clientResponse.status !== 200 && clientResponse.text !== 'OK') {
+            throw new Error('Failed to send client email. Status: ' + clientResponse.status);
           }
+          
+          // Check for referrer and send referral email if exists
+          const referrerEmail = getReferrer();
+          if (referrerEmail && isValidEmail(referrerEmail)) {
+            try {
+              const referralTemplateParams = formatReferralData(formData, referrerEmail);
+              
+              // Security check: ensure referral email doesn't contain sensitive data
+              const sensitiveFields = ['email', 'phone', 'description', 'device', 'project_budget', 'project_description', 'existing_website'];
+              const hasSensitiveData = sensitiveFields.some(field => referralTemplateParams[field]);
+              
+              if (!hasSensitiveData) {
+                await emailjs.send(
+                  EMAILJS_CONFIG.referralServiceId,
+                  EMAILJS_CONFIG.referralTemplateId,
+                  referralTemplateParams,
+                  EMAILJS_CONFIG.publicKey
+                );
+              }
+            } catch (referralError) {
+              console.error('Failed to send referral email:', referralError);
+              // Continue with success flow even if referral email fails
+            }
+          }
+          
+          // Clear saved data on successful submission
+          deleteCookie(COOKIE_NAME);
+          showSuccess();
         } catch (error) {
           console.error('Form submission error:', error);
-          showError(error.message || 'Failed to send your inquiry. Please try again.');
+          showError(error.text || error.message || 'Failed to send your inquiry. Please try again.');
         }
       }
       
@@ -1897,10 +2081,284 @@ Submitted: ${new Date().toLocaleString()}`
       });
       
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.classList.contains('show')) {
-          closeModal();
+        if (e.key === 'Escape') {
+          const countryDropdown = $('#countryDropdown');
+          if (countryDropdown && countryDropdown.style.display === 'block') {
+            const countryDropdownBackdrop = $('#countryDropdownBackdrop');
+            countryDropdown.style.display = 'none';
+            if (countryDropdownBackdrop) {
+              countryDropdownBackdrop.style.display = 'none';
+            }
+            const countrySelector = $('#countrySelector');
+            if (countrySelector) {
+              countrySelector.classList.remove('open');
+            }
+            return;
+          }
+          if (modal.classList.contains('show')) {
+            closeModal();
+          }
         }
       });
+      
+      // Initialize auto-save
+      setupAutoSave();
+      window.addEventListener('beforeunload', saveFormData);
+      
+      // ===== Country Code Selector =====
+      const countrySelector = $('#countrySelector');
+      const countryDropdown = $('#countryDropdown');
+      const countryDropdownBackdrop = $('#countryDropdownBackdrop');
+      const countryDropdownCloseBtn = $('#closeCountryDropdown');
+      const countryList = $('#countryList');
+      const countrySearch = $('#countrySearch');
+      const selectedFlag = $('#selectedFlag');
+      const selectedCode = $('#selectedCode');
+      const phoneCountryCode = $('#phoneCountryCode');
+      const phoneInput = $('#phone');
+      
+      const countries = [
+        { code: 'us', name: 'United States', dialCode: '+1' },
+        { code: 'gb', name: 'United Kingdom', dialCode: '+44' },
+        { code: 'ca', name: 'Canada', dialCode: '+1' },
+        { code: 'au', name: 'Australia', dialCode: '+61' },
+        { code: 'de', name: 'Germany', dialCode: '+49' },
+        { code: 'fr', name: 'France', dialCode: '+33' },
+        { code: 'es', name: 'Spain', dialCode: '+34' },
+        { code: 'it', name: 'Italy', dialCode: '+39' },
+        { code: 'nl', name: 'Netherlands', dialCode: '+31' },
+        { code: 'se', name: 'Sweden', dialCode: '+46' },
+        { code: 'no', name: 'Norway', dialCode: '+47' },
+        { code: 'dk', name: 'Denmark', dialCode: '+45' },
+        { code: 'fi', name: 'Finland', dialCode: '+358' },
+        { code: 'ch', name: 'Switzerland', dialCode: '+41' },
+        { code: 'at', name: 'Austria', dialCode: '+43' },
+        { code: 'be', name: 'Belgium', dialCode: '+32' },
+        { code: 'ie', name: 'Ireland', dialCode: '+353' },
+        { code: 'nz', name: 'New Zealand', dialCode: '+64' },
+        { code: 'jp', name: 'Japan', dialCode: '+81' },
+        { code: 'kr', name: 'South Korea', dialCode: '+82' },
+        { code: 'cn', name: 'China', dialCode: '+86' },
+        { code: 'in', name: 'India', dialCode: '+91' },
+        { code: 'sg', name: 'Singapore', dialCode: '+65' },
+        { code: 'hk', name: 'Hong Kong', dialCode: '+852' },
+        { code: 'mx', name: 'Mexico', dialCode: '+52' },
+        { code: 'br', name: 'Brazil', dialCode: '+55' },
+        { code: 'ar', name: 'Argentina', dialCode: '+54' },
+        { code: 'cl', name: 'Chile', dialCode: '+56' },
+        { code: 'co', name: 'Colombia', dialCode: '+57' },
+        { code: 'pe', name: 'Peru', dialCode: '+51' },
+        { code: 'za', name: 'South Africa', dialCode: '+27' },
+        { code: 'ng', name: 'Nigeria', dialCode: '+234' },
+        { code: 'eg', name: 'Egypt', dialCode: '+20' },
+        { code: 'ae', name: 'United Arab Emirates', dialCode: '+971' },
+        { code: 'sa', name: 'Saudi Arabia', dialCode: '+966' },
+        { code: 'il', name: 'Israel', dialCode: '+972' },
+        { code: 'tr', name: 'Turkey', dialCode: '+90' },
+        { code: 'ru', name: 'Russia', dialCode: '+7' },
+        { code: 'pl', name: 'Poland', dialCode: '+48' },
+        { code: 'cz', name: 'Czech Republic', dialCode: '+420' },
+        { code: 'gr', name: 'Greece', dialCode: '+30' },
+        { code: 'pt', name: 'Portugal', dialCode: '+351' },
+        { code: 'ro', name: 'Romania', dialCode: '+40' },
+        { code: 'hu', name: 'Hungary', dialCode: '+36' },
+        { code: 'th', name: 'Thailand', dialCode: '+66' },
+        { code: 'my', name: 'Malaysia', dialCode: '+60' },
+        { code: 'id', name: 'Indonesia', dialCode: '+62' },
+        { code: 'ph', name: 'Philippines', dialCode: '+63' },
+        { code: 'vn', name: 'Vietnam', dialCode: '+84' },
+        { code: 'pk', name: 'Pakistan', dialCode: '+92' },
+        { code: 'bd', name: 'Bangladesh', dialCode: '+880' },
+        { code: 'ua', name: 'Ukraine', dialCode: '+380' },
+      ];
+      
+      countries.sort((a, b) => a.name.localeCompare(b.name));
+      
+      function populateCountryList(filterText = '') {
+        const filteredCountries = countries.filter(country => 
+          country.name.toLowerCase().includes(filterText.toLowerCase()) ||
+          country.dialCode.includes(filterText)
+        );
+        
+        if (countryList) {
+          countryList.innerHTML = filteredCountries.map(country => `
+            <div class="country-item" data-code="${country.code}" data-dial="${country.dialCode}">
+              <img src="../media/flags/${country.code}.svg" alt="${country.name}" class="country-item-flag" onerror="this.style.display='none'">
+              <span class="country-item-name">${country.name}</span>
+              <span class="country-item-code">${country.dialCode}</span>
+            </div>
+          `).join('');
+          
+          countryList.querySelectorAll('.country-item').forEach(item => {
+            item.addEventListener('click', () => {
+              const code = item.dataset.code;
+              const dialCode = item.dataset.dial;
+              selectCountry(code, dialCode);
+            });
+          });
+        }
+      }
+      
+      function selectCountry(code, dialCode) {
+        if (selectedFlag && selectedCode && phoneCountryCode) {
+          selectedFlag.src = `../media/flags/${code}.svg`;
+          selectedFlag.alt = `${code.toUpperCase()} Flag`;
+          selectedCode.textContent = dialCode;
+          phoneCountryCode.value = dialCode;
+          setCookie('phoneCountrySelection', JSON.stringify({ code: code, dialCode: dialCode }), COOKIE_EXPIRY_DAYS);
+        }
+        closeCountryDropdown();
+        if (phoneInput) phoneInput.focus();
+      }
+      
+      function toggleCountryDropdown() {
+        if (!countryDropdown) return;
+        const isOpen = countryDropdown.style.display === 'block';
+        if (isOpen) {
+          closeCountryDropdown();
+        } else {
+          openCountryDropdown();
+        }
+      }
+      
+      function openCountryDropdown() {
+        if (countryDropdownBackdrop) countryDropdownBackdrop.style.display = 'block';
+        if (countryDropdown) countryDropdown.style.display = 'block';
+        if (countrySelector) countrySelector.classList.add('open');
+        if (countrySearch) countrySearch.value = '';
+        populateCountryList();
+        setTimeout(() => {
+          if (countrySearch) countrySearch.focus();
+        }, 100);
+      }
+      
+      function closeCountryDropdown() {
+        if (countryDropdownBackdrop) countryDropdownBackdrop.style.display = 'none';
+        if (countryDropdown) countryDropdown.style.display = 'none';
+        if (countrySelector) countrySelector.classList.remove('open');
+      }
+      
+      if (countrySelector) {
+        countrySelector.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleCountryDropdown();
+        });
+      }
+      if (countryDropdownCloseBtn) {
+        countryDropdownCloseBtn.addEventListener('click', closeCountryDropdown);
+      }
+      if (countrySearch) {
+        countrySearch.addEventListener('input', (e) => {
+          populateCountryList(e.target.value);
+        });
+        countrySearch.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+      }
+      if (countryDropdown) {
+        countryDropdown.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+      }
+      if (countryDropdownBackdrop) {
+        countryDropdownBackdrop.addEventListener('click', closeCountryDropdown);
+      }
+      document.addEventListener('click', (e) => {
+        if (countryDropdown && countryDropdown.style.display === 'block') {
+          if (!countryDropdown.contains(e.target) && e.target !== countrySelector) {
+            closeCountryDropdown();
+          }
+        }
+      });
+      if (countryList) populateCountryList();
+      
+      // Load saved country selection
+      function loadSavedCountrySelection() {
+        const savedSelection = getCookie('phoneCountrySelection');
+        if (savedSelection && selectedFlag && selectedCode && phoneCountryCode) {
+          try {
+            const { code, dialCode } = JSON.parse(savedSelection);
+            if (code && dialCode) {
+              selectedFlag.src = `../media/flags/${code}.svg`;
+              selectedFlag.alt = `${code.toUpperCase()} Flag`;
+              selectedCode.textContent = dialCode;
+              phoneCountryCode.value = dialCode;
+            }
+          } catch (e) {
+            console.warn('Failed to load saved country selection:', e);
+          }
+        }
+      }
+      loadSavedCountrySelection();
+      
+      // ===== Phone Number Formatting =====
+      if (phoneInput) {
+        phoneInput.addEventListener('input', (e) => {
+          let value = e.target.value.replace(/\D/g, '');
+          if (value.length > 20) value = value.slice(0, 20);
+          
+          let formattedValue = '';
+          if (value.length > 0) {
+            if (value.length === 1 || value.length === 2) {
+              formattedValue = value;
+            } else if (value.length === 3) {
+              formattedValue = '(' + value + ')';
+            } else if (value.length > 3 && value.length <= 6) {
+              formattedValue = '(' + value.substring(0, 3) + ')-' + value.substring(3, 6);
+            } else if (value.length > 6 && value.length <= 10) {
+              formattedValue = '(' + value.substring(0, 3) + ')-' + value.substring(3, 6) + '-' + value.substring(6, 10);
+            } else if (value.length > 10) {
+              formattedValue = '(' + value.substring(0, 3) + ')-' + value.substring(3, 6) + '-' + value.substring(6, 10) + '-' + value.substring(10, 20);
+            }
+          }
+          e.target.value = formattedValue;
+          e.target.setCustomValidity('');
+        });
+        
+        phoneInput.addEventListener('keypress', (e) => {
+          if ([8, 9, 27, 13, 46].includes(e.keyCode) || 
+              (e.keyCode === 65 && e.ctrlKey === true) ||
+              (e.keyCode === 67 && e.ctrlKey === true) ||
+              (e.keyCode === 86 && e.ctrlKey === true) ||
+              (e.keyCode === 88 && e.ctrlKey === true)) {
+            return;
+          }
+          if ((e.key < '0' || e.key > '9') && e.key !== 'Backspace' && e.key !== 'Delete') {
+            e.preventDefault();
+          }
+        });
+        
+        phoneInput.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const pastedData = (e.clipboardData || window.clipboardData).getData('text');
+          const numbers = pastedData.replace(/\D/g, '').slice(0, 20);
+          let formattedValue = '';
+          if (numbers.length > 0) {
+            if (numbers.length === 1 || numbers.length === 2) {
+              formattedValue = numbers;
+            } else if (numbers.length === 3) {
+              formattedValue = '(' + numbers + ')';
+            } else if (numbers.length > 3 && numbers.length <= 6) {
+              formattedValue = '(' + numbers.substring(0, 3) + ')-' + numbers.substring(3, 6);
+            } else if (numbers.length > 6 && numbers.length <= 10) {
+              formattedValue = '(' + numbers.substring(0, 3) + ')-' + numbers.substring(3, 6) + '-' + numbers.substring(6, 10);
+            } else if (numbers.length > 10) {
+              formattedValue = '(' + numbers.substring(0, 3) + ')-' + numbers.substring(3, 6) + '-' + numbers.substring(6, 10) + '-' + numbers.substring(10, 20);
+            }
+          }
+          phoneInput.value = formattedValue;
+          phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        
+        phoneInput.addEventListener('blur', (e) => {
+          const digitCount = e.target.value.replace(/\D/g, '').length;
+          if (digitCount > 0 && digitCount < 3) {
+            e.target.setCustomValidity('Phone number must have at least 3 digits');
+          } else {
+            e.target.setCustomValidity('');
+          }
+        });
+      }
     }
     
     // Initialize form when DOM is ready
@@ -1959,6 +2417,19 @@ Submitted: ${new Date().toLocaleString()}`
             </button>
             <input type="tel" id="phone" name="phone" class="form-input phone-input" placeholder="(555)-555-5555" required minlength="1" title="Please enter a phone number">
             <input type="hidden" id="phoneCountryCode" name="phoneCountryCode" value="+1">
+          </div>
+        </div>
+        
+        <!-- Country Dropdown Backdrop (outside form-group) -->
+        <div class="country-dropdown-backdrop" id="countryDropdownBackdrop" style="display: none;"></div>
+        <div class="country-dropdown" id="countryDropdown" style="display: none;">
+          <div class="country-dropdown-header">
+            <h3 class="country-dropdown-title">Select Country Code</h3>
+            <button type="button" class="country-dropdown-close" id="closeCountryDropdown" aria-label="Close country selector">×</button>
+          </div>
+          <input type="text" class="country-search" id="countrySearch" placeholder="Search countries...">
+          <div class="country-list" id="countryList">
+            <!-- Countries will be populated by JavaScript -->
           </div>
         </div>
         
